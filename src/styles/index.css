@@ -1,0 +1,141 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #080807;
+  --color-surface: #11100e;
+  --color-elevated: #181512;
+  --color-soft: #211a13;
+  --color-border: #302820;
+  --color-primary-text: #ece6d8;
+  --color-body-text: #a89f91;
+  --color-muted-text: #6f665b;
+  --color-red: #e5484d;
+  --color-amber: #f5b84b;
+  --font-mono: "JetBrains Mono", "IBM Plex Mono", "SFMono-Regular", Consolas,
+    "Liberation Mono", monospace;
+  --font-sans: "IBM Plex Sans", Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    letter-spacing: 0;
+    background: var(--color-background);
+    color: var(--color-primary-text);
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    background: var(--color-background);
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at 14% 0%, rgba(229, 72, 77, 0.12), transparent 30rem),
+      var(--color-background);
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+}
+
+@layer components {
+  .page-shell {
+    @apply mx-auto w-full max-w-6xl px-5;
+  }
+
+  .page-section {
+    @apply py-12;
+  }
+
+  .section-kicker {
+    @apply font-mono text-sm text-amber;
+  }
+
+  .section-title {
+    @apply mt-2 font-mono text-3xl font-semibold text-primary-text;
+  }
+
+  .section-copy {
+    @apply mt-3 max-w-2xl text-body-text;
+  }
+
+  .card-grid {
+    @apply mt-8 grid grid-cols-1 gap-4 md:grid-cols-3;
+  }
+
+  .card-grid-four {
+    @apply mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4;
+  }
+
+  .visual-field {
+    @apply mt-10 overflow-hidden border border-border bg-surface;
+  }
+
+  .solar-background {
+    position: relative;
+    min-height: 18rem;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 68% 50%, rgba(236, 230, 216, 0.9) 0 2.7rem, transparent 2.85rem),
+      conic-gradient(
+        from -18deg at 68% 50%,
+        rgba(245, 184, 75, 0.08) 0deg,
+        rgba(245, 184, 75, 0.42) 8deg,
+        rgba(229, 72, 77, 0.16) 13deg,
+        transparent 19deg,
+        transparent 28deg,
+        rgba(245, 184, 75, 0.32) 35deg,
+        transparent 43deg
+      ),
+      linear-gradient(135deg, var(--color-elevated), var(--color-soft));
+  }
+
+  .solar-background::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(rgba(236, 230, 216, 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(236, 230, 216, 0.025) 1px, transparent 1px);
+    background-size: 18px 18px;
+    mix-blend-mode: screen;
+    opacity: 0.45;
+  }
+
+  .solar-background::after {
+    content: "";
+    position: absolute;
+    inset: auto -12% -28% 10%;
+    height: 58%;
+    background: linear-gradient(135deg, rgba(8, 8, 7, 0.15), rgba(8, 8, 7, 0.92));
+    transform: skewY(-7deg);
+  }
+
+  .solar-background--compact {
+    min-height: 12rem;
+  }
+}
