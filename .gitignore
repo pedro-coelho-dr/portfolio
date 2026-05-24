@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+.codex/
+.agents/
+
+AGENTS.md

@@ -1,4 +1,3 @@
-import SolarBackground from '../components/SolarBackground'
 import VisualCard from '../components/VisualCard'
 import { code } from '../data/code'
 import { projects } from '../data/projects'
@@ -7,18 +6,16 @@ import { texts } from '../data/texts'
 function Home() {
   return (
     <>
-      <section className="page-shell page-section">
-        <div className="max-w-3xl">
-          <p className="section-kicker">cybersecurity · dev · applied AI</p>
-          <h1 className="mt-4 font-mono text-4xl font-semibold text-primary-text">
-            Pedro Coelho
-          </h1>
-          <p className="mt-5 max-w-2xl text-lg text-body-text">
-            Portfolio of security labs, code experiments, and technical notes.
-          </p>
-        </div>
-        <div className="visual-field">
-          <SolarBackground />
+      <section className="home-hero page-shell">
+        <div className="home-hero-inner">
+          <h1 className="home-hero-title">pedro coelho</h1>
+          <p className="home-hero-kicker">cybersecurity · dev · applied AI</p>
+          <div className="home-whoami">
+            <p>
+              Recife-based CS student building security labs, tooling experiments, and
+              technical artifacts around cybersecurity and applied AI.
+            </p>
+          </div>
         </div>
       </section>
 

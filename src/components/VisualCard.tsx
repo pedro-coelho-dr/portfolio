@@ -27,7 +27,7 @@ function VisualCard({
   const content = (
     <>
       <div className={`h-32 border ${toneClasses[tone]}`}>
-        <div className="h-full bg-[linear-gradient(135deg,rgba(236,230,216,0.06)_0,transparent_35%),radial-gradient(circle_at_72%_38%,rgba(245,184,75,0.28),transparent_26%),radial-gradient(circle_at_24%_78%,rgba(229,72,77,0.22),transparent_24%)]" />
+        <div className="h-full bg-[linear-gradient(135deg,rgba(236,230,216,0.06)_0,transparent_35%),radial-gradient(circle_at_72%_38%,rgba(245,213,71,0.24),transparent_26%),radial-gradient(circle_at_24%_78%,rgba(229,72,77,0.22),transparent_24%),radial-gradient(circle_at_50%_12%,rgba(255,79,154,0.14),transparent_24%)]" />
       </div>
       <div className="mt-5">
         {eyebrow ? <p className="font-mono text-xs text-amber">{eyebrow}</p> : null}
@@ -46,13 +46,13 @@ function VisualCard({
 
   if (to) {
     return (
-      <Link className="block border border-border bg-surface p-4 hover:border-red/70" to={to}>
+      <Link className="block border border-border/80 bg-background/95 p-4 hover:border-red/70" to={to}>
         {content}
       </Link>
     )
   }
 
-  return <article className="border border-border bg-surface p-4">{content}</article>
+  return <article className="border border-border/80 bg-background/95 p-4">{content}</article>
 }
 
 export default VisualCard
