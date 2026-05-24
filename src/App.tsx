@@ -10,7 +10,7 @@ import Text from './pages/Text'
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <PosterShell>
         <div id="top" className="min-h-screen text-primary-text">
           <Header />
