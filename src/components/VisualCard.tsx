@@ -1,58 +1,30 @@
 import { Link } from 'react-router-dom'
-import Tag from './Tag'
 
 type VisualCardProps = {
-  description: string
+  description?: string
   eyebrow?: string
+  index?: number
   meta?: string[]
   title: string
   to?: string
   tone?: 'amber' | 'neutral' | 'red'
 }
 
-const toneClasses = {
-  amber: 'border-amber/45 bg-amber/10',
-  neutral: 'border-border bg-elevated',
-  red: 'border-red/50 bg-red/10',
-}
+function VisualCard({ description, eyebrow, title, to }: VisualCardProps) {
+  // Placeholder behavior: every card falls through to /project/glhf as the template
+  // detail page until individual routes exist. Explicit `to` props still win.
+  const target = to ?? '/project/glhf'
 
-function VisualCard({
-  description,
-  eyebrow,
-  meta = [],
-  title,
-  to,
-  tone = 'neutral',
-}: VisualCardProps) {
-  const content = (
-    <>
-      <div className={`h-32 border ${toneClasses[tone]}`}>
-        <div className="h-full bg-[linear-gradient(135deg,rgba(236,230,216,0.06)_0,transparent_35%),radial-gradient(circle_at_72%_38%,rgba(245,213,71,0.24),transparent_26%),radial-gradient(circle_at_24%_78%,rgba(229,72,77,0.22),transparent_24%),radial-gradient(circle_at_50%_12%,rgba(255,79,154,0.14),transparent_24%)]" />
+  return (
+    <Link className="specimen-card specimen-card--link" to={target}>
+      <div aria-hidden="true" className="specimen-card-image" />
+      <div className="specimen-card-info">
+        {eyebrow ? <span className="specimen-card-eyebrow">{eyebrow}</span> : null}
+        <h3 className="specimen-card-title">{title}</h3>
+        {description ? <p className="specimen-card-summary">{description}</p> : null}
       </div>
-      <div className="mt-5">
-        {eyebrow ? <p className="font-mono text-xs text-amber">{eyebrow}</p> : null}
-        <h3 className="mt-1 font-mono text-xl font-semibold text-primary-text">{title}</h3>
-        <p className="mt-3 text-sm text-body-text">{description}</p>
-      </div>
-      {meta.length > 0 ? (
-        <div className="mt-5 flex flex-wrap gap-2">
-          {meta.map((item) => (
-            <Tag key={item}>{item}</Tag>
-          ))}
-        </div>
-      ) : null}
-    </>
+    </Link>
   )
-
-  if (to) {
-    return (
-      <Link className="block border border-border/80 bg-background/95 p-4 hover:border-red/70" to={to}>
-        {content}
-      </Link>
-    )
-  }
-
-  return <article className="border border-border/80 bg-background/95 p-4">{content}</article>
 }
 
 export default VisualCard

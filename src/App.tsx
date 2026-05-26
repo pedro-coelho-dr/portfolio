@@ -12,7 +12,7 @@ function App() {
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       <PosterShell>
-        <div id="top" className="min-h-screen text-primary-text">
+        <div id="top" className="flex min-h-screen flex-col text-primary-text">
           <Header />
           <main>
             <Routes>
@@ -23,6 +23,7 @@ function App() {
               <Route path="/project/glhf" element={<Glhf />} />
             </Routes>
           </main>
+          <div aria-hidden="true" className="page-tail" />
           <Footer />
         </div>
       </PosterShell>

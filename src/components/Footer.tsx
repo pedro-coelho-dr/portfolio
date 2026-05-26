@@ -1,11 +1,32 @@
 import type { FormEvent } from 'react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 const CONTACT_EMAIL = 'pedrocoelhodr@gmail.com'
 
 function Footer() {
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState('')
+  const [isOpen, setIsOpen] = useState(false)
+  const footerEndRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!isOpen) return
+    const timer = window.setTimeout(() => {
+      footerEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    }, 80)
+    return () => window.clearTimeout(timer)
+  }, [isOpen])
+
+  useEffect(() => {
+    function handleExternalOpen() {
+      setIsOpen(true)
+      window.setTimeout(() => {
+        footerEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+      }, 120)
+    }
+    window.addEventListener('open-contact-form', handleExternalOpen)
+    return () => window.removeEventListener('open-contact-form', handleExternalOpen)
+  }, [])
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -19,39 +40,71 @@ function Footer() {
   return (
     <footer className="footer-contact">
       <div className="page-shell footer-contact-inner">
-        <form className="footer-form" onSubmit={handleSubmit}>
-          <h2 className="footer-title">Let&apos;s Talk</h2>
-
-          <label className="footer-label" htmlFor="contact-email">
-            e-mail
-          </label>
-          <input
-            className="footer-input"
-            id="contact-email"
-            name="email"
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder="e-mail"
-            type="email"
-            value={email}
-          />
-
-          <label className="footer-label" htmlFor="contact-text">
-            text
-          </label>
-          <textarea
-            className="footer-textarea"
-            id="contact-text"
-            name="text"
-            onChange={(event) => setMessage(event.target.value)}
-            placeholder="text"
-            rows={3}
-            value={message}
-          />
-
-          <button className="footer-button" type="submit">
-            ping
+        <div className="footer-toggle-wrap">
+          <button
+            aria-controls="footer-talk-form"
+            aria-expanded={isOpen}
+            aria-label={isOpen ? 'Close contact form' : 'Open contact form'}
+            className="footer-toggle"
+            onClick={() => setIsOpen((v) => !v)}
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              className="footer-toggle-icon"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M5 5h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H9.6L5 20.5V5Z"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.7"
+              />
+              <path
+                d="M9 10.25h6M9 13h4"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeWidth="1.6"
+              />
+            </svg>
           </button>
-        </form>
+        </div>
+
+        {isOpen ? (
+          <form className="footer-form" id="footer-talk-form" onSubmit={handleSubmit}>
+            <label className="footer-label" htmlFor="contact-email">
+              e-mail
+            </label>
+            <input
+              className="footer-input"
+              id="contact-email"
+              name="email"
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="your@email"
+              type="email"
+              value={email}
+            />
+
+            <label className="footer-label" htmlFor="contact-text">
+              text
+            </label>
+            <textarea
+              className="footer-textarea"
+              id="contact-text"
+              name="text"
+              onChange={(event) => setMessage(event.target.value)}
+              placeholder="message"
+              rows={4}
+              value={message}
+            />
+
+            <button className="footer-button" type="submit">
+              ping
+            </button>
+          </form>
+        ) : null}
 
         <div className="footer-links-wrap">
           <nav aria-label="Contact links" className="footer-links">
@@ -89,6 +142,29 @@ function Footer() {
             </a>
           </nav>
         </div>
+
+        <a className="back-to-top" href="#top">
+          ↑ back to top
+        </a>
+
+        <p className="footer-bottom-line">
+          <span>Pedro Coelho</span>
+          <span className="footer-bottom-line-sep">·</span>
+          <span>2026</span>
+          <span className="footer-bottom-line-sep">·</span>
+          <span>Recife</span>
+          <svg
+            aria-label="Brazil"
+            className="footer-bottom-line-flag"
+            role="img"
+            viewBox="0 0 20 14"
+          >
+            <rect fill="#009c3b" height="14" width="20" />
+            <polygon fill="#ffdf00" points="10,1.7 18.3,7 10,12.3 1.7,7" />
+            <circle cx="10" cy="7" fill="#002776" r="2.5" />
+          </svg>
+        </p>
+        <div aria-hidden="true" ref={footerEndRef} />
       </div>
     </footer>
   )
