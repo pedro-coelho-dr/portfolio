@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Footer from './components/Footer'
 import Header from './components/Header'
 import PosterShell from './components/PosterShell'
+import ScrollToTop from './components/ScrollToTop'
 import Code from './pages/Code'
 import Glhf from './pages/Glhf'
 import Home from './pages/Home'
@@ -12,6 +13,7 @@ function App() {
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       <PosterShell>
+        <ScrollToTop />
         <div id="top" className="flex min-h-screen flex-col text-primary-text">
           <Header />
           <main>

@@ -10,46 +10,22 @@ function Home() {
 
   return (
     <>
-      <section className="home-hero page-shell">
-        <div className="home-hero-inner">
-          <p className="hero-meta-strip">
-            <span>[ portfolio ]</span>
-            <span className="hero-meta-strip-sep">/</span>
-            <span>2025</span>
-            <span className="hero-meta-strip-sep">/</span>
-            <span>recife · brazil</span>
-          </p>
+      <section className="home-hero">
+        <div className="home-hero-inner page-shell">
+          <img
+            alt="Pedro Coelho logo"
+            className="home-hero-logo"
+            src={`${import.meta.env.BASE_URL}logo.png`}
+          />
           <h1 className="home-hero-title">pedro coelho</h1>
           <p className="home-hero-kicker">offsec · dev · ai</p>
-          <div className="home-platform">
-            <div className="home-platform-face">
-              <p>Computer Science · Cybersecurity specialization</p>
-              <p>Focused on offensive security, software engineering, and applied AI.</p>
-              <p>
-                Building tools, writeups, and experiments across hacking, agents, and
-                software systems.
-              </p>
-            </div>
-            <div aria-hidden="true" className="home-platform-edge" />
-          </div>
+          <p className="home-hero-bio">
+            Computer Scientist and Cybersecurity specialist from CESAR School.
+            Based in Recife, working at Tempest Security Intelligence,
+            with interests in hacking, software engineering, and applied AI.
+          </p>
           {/* TODO: replace cv.pdf with the final exported CV file once it is added to public/. */}
           <div className="home-hero-actions">
-            <a aria-label="Download CV" className="hero-action" href={cvHref}>
-              <svg
-                aria-hidden="true"
-                className="hero-action-icon"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M12 4v12m0 0 4.25-4.25M12 16l-4.25-4.25M5 19.5h14"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1.75"
-                />
-              </svg>
-            </a>
             <button
               aria-label="Open contact form"
               className="hero-action"
@@ -58,6 +34,7 @@ function Home() {
               }
               type="button"
             >
+              let's talk
               <svg
                 aria-hidden="true"
                 className="hero-action-icon"
@@ -79,6 +56,23 @@ function Home() {
                 />
               </svg>
             </button>
+            <a aria-label="Download CV" className="hero-cv-btn" href={cvHref}>
+              <svg
+                aria-hidden="true"
+                className="hero-cv-icon"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M12 4v12m0 0 4.25-4.25M12 16l-4.25-4.25M5 19.5h14"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1.75"
+                />
+              </svg>
+              cv
+            </a>
           </div>
         </div>
       </section>

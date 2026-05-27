@@ -41,6 +41,11 @@
   html {
     scroll-behavior: smooth;
     background: var(--color-background);
+    /* Always reserve the scrollbar gutter so content width never changes
+       when navigating between short and tall pages. Without this, any page
+       that gains or loses a vertical scrollbar shifts every centered element
+       left/right by ~8px (half the scrollbar width). */
+    scrollbar-gutter: stable;
   }
 
   body {
@@ -105,88 +110,119 @@
     opacity: 0.08;
   }
 
+  /* ── Inverted hanging-tab navbar ─────────────────────────── */
+
   .site-header {
-    position: relative;
-    z-index: 20;
-    padding-top: 0.3rem;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    width: 100%;
+    background: transparent;
+    overflow: visible;
   }
 
   .site-header .page-shell {
     display: flex;
+    align-items: flex-start;
     justify-content: center;
+    padding-top: 0;
+    padding-bottom: 0;
   }
 
   .poster-nav {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.75rem;
-    border: 1px solid rgba(236, 230, 216, 0.08);
-    border-radius: 999px;
-    background:
-      repeating-conic-gradient(
-        from -18deg at 50% 100%,
-        rgba(238, 234, 226, 0.12) 0deg 8deg,
-        rgba(202, 197, 190, 0.09) 8deg 16deg,
-        rgba(156, 151, 145, 0.07) 16deg 24deg,
-        rgba(238, 234, 226, 0.12) 24deg 32deg,
-        rgba(202, 197, 190, 0.09) 32deg 40deg,
-        rgba(156, 151, 145, 0.07) 40deg 48deg
-      ) fixed,
-      linear-gradient(180deg, rgba(17, 16, 14, 0.96), rgba(8, 8, 7, 0.92));
-    padding: 0.58rem 1rem;
-    font-family: var(--font-mono);
-    box-shadow:
-      0 0.8rem 2rem rgba(8, 8, 7, 0.34);
+    align-items: flex-start;
+    gap: 3px;
   }
 
+  /* ── Shared tab shape ──────────────────────────────────────── */
   .poster-nav-link {
     position: relative;
-    color: rgba(168, 159, 145, 0.82);
-    opacity: 1;
-    padding: 0.2rem 0.45rem;
-    font-size: clamp(1.05rem, 2vw, 1.28rem);
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    /* Less padding at the open top, more at the hanging bottom face */
+    padding: 0.28rem 1.2rem 0.52rem;
+    border: none;                /* no grey lines — shape is defined by bg alone */
+    border-radius: 0 0 2px 2px;
+    background: rgba(8, 8, 7, 0.88);
+    color: rgba(168, 159, 145, 0.62);
+    font-family: var(--font-mono);
+    font-size: clamp(0.78rem, 0.95vw, 0.88rem);
+    /* Always bold — weight never changes, so no tab ever shifts the nav width */
     font-weight: 700;
-    line-height: 1;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
     text-transform: lowercase;
-    transition: color 120ms ease;
+    white-space: nowrap;
+    /* No transform in transition — prevents gap-exposing vertical shift */
+    transition:
+      color 130ms ease,
+      background-color 130ms ease,
+      box-shadow 130ms ease;
   }
 
-  .poster-nav-link:hover {
-    color: rgba(236, 230, 216, 0.86);
+  /* ── Inactive hover: depth via shadow + bg, zero movement ─── */
+  .poster-nav-link:hover:not(.poster-nav-link--active) {
+    color: rgba(255, 79, 154, 0.72);
+    background: rgba(14, 12, 9, 0.96);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
   }
 
   .poster-nav-link:focus-visible {
-    outline: 1.5px solid rgba(236, 230, 216, 0.5);
-    outline-offset: 4px;
-    border-radius: 2px;
+    outline: 1.5px solid rgba(255, 79, 154, 0.5);
+    outline-offset: -2px;
+    border-radius: 0 0 2px 2px;
   }
 
-  .poster-nav-link--active,
+  /* ── Active tab: longer padding-bottom = hangs lower, no gap ─ */
+  .poster-nav-link--active {
+    z-index: 3;
+    color: rgba(236, 230, 216, 0.96);
+    /* font-weight stays 700 (same as base) — no layout shift */
+    /* Only padding-bottom changes: tab is physically taller, hangs further.
+       Top stays sealed to the screen edge — no seams, no gaps. */
+    padding-bottom: 1.26rem;
+    background: rgba(20, 17, 12, 0.98);
+    /* Single clean drop shadow — no side halos */
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.48);
+  }
+
+  /* Active hover: only brighten text, hold everything else steady */
   .poster-nav-link--active:hover {
     color: rgba(236, 230, 216, 1);
-    font-weight: 800;
-  }
-
-  .poster-nav-link--active::after {
-    content: "";
-    position: absolute;
-    left: 0.45rem;
-    right: 0.45rem;
-    bottom: -0.22rem;
-    height: 1.5px;
-    background: rgba(236, 230, 216, 0.7);
+    background: rgba(20, 17, 12, 0.98);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.48);
   }
 
   .home-hero {
-    display: grid;
-    max-width: min(88rem, calc(100vw - 1.5rem));
-    min-height: clamp(26rem, 60vh, 36rem);
-    place-items: center;
-    padding-top: clamp(2.4rem, 6vw, 5rem);
-    padding-bottom: clamp(2.2rem, 4.5vw, 3.4rem);
-    text-align: center;
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    margin-top: clamp(1.2rem, 2.2vw, 1.8rem);
+    min-height: clamp(44vh, 56vh, 68vh);
+    padding-block: clamp(2.8rem, 5.5vw, 4.2rem);
+    background:
+      linear-gradient(
+        to top,
+        rgba(8, 8, 7, 0.72),
+        rgba(8, 8, 7, 0.38) 34%,
+        rgba(8, 8, 7, 0.82)
+      ),
+      linear-gradient(rgba(236, 230, 216, 0.012) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(236, 230, 216, 0.01) 1px, transparent 1px),
+      repeating-conic-gradient(
+        from -18deg at 50% 100%,
+        rgba(238, 234, 226, 0.16) 0deg 8deg,
+        rgba(202, 197, 190, 0.12) 8deg 16deg,
+        rgba(156, 151, 145, 0.09) 16deg 24deg,
+        rgba(238, 234, 226, 0.16) 24deg 32deg,
+        rgba(202, 197, 190, 0.12) 32deg 40deg,
+        rgba(156, 151, 145, 0.09) 40deg 48deg
+      ) fixed,
+      linear-gradient(rgba(8, 8, 7, 0.8), rgba(8, 8, 7, 0.92)),
+      #080807;
+    background-size: auto, 22px 22px, 22px 22px, auto, auto, auto;
   }
 
   .section-band {
@@ -221,58 +257,26 @@
     margin-top: clamp(2.4rem, 4.2vw, 3.6rem);
   }
 
+  /* Standardise the colorful-rays gap above the first band on inner pages
+     so it matches the .home-hero margin-top visually */
+  main > .section-band:first-child {
+    margin-top: clamp(1.2rem, 2.2vw, 1.8rem);
+  }
+
   .home-hero-inner {
-    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
-    max-width: 44rem;
-    margin-inline: auto;
-    padding: 2.6rem 1.4rem 2.2rem;
+    text-align: center;
   }
 
-  .home-hero-inner::before,
-  .home-hero-inner::after {
-    content: "";
-    position: absolute;
-    width: 16px;
-    height: 16px;
-    border: 1px solid rgba(168, 159, 145, 0.38);
-    pointer-events: none;
-  }
 
-  .home-hero-inner::before {
-    top: 0;
-    left: 0;
-    border-right: none;
-    border-bottom: none;
-  }
-
-  .home-hero-inner::after {
-    bottom: 0;
-    right: 0;
-    border-left: none;
-    border-top: none;
-  }
-
-  .hero-meta-strip {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 0.55rem;
-    margin: 0 0 1.85rem;
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: rgba(168, 159, 145, 0.55);
-  }
-
-  .hero-meta-strip-sep {
-    color: rgba(168, 159, 145, 0.28);
+  .home-hero-logo {
+    width: clamp(4.6rem, 7.2vw, 6.4rem);
+    height: auto;
+    margin-bottom: 1.5rem;
+    opacity: 0.9;
   }
 
   .home-hero-title {
@@ -288,81 +292,26 @@
   }
 
   .home-hero-kicker {
-    margin: 0.95rem 0 0;
-    color: rgba(168, 159, 145, 0.7);
+    margin: 1.1rem 0 0;
+    color: rgba(255, 79, 154, 0.48);
     font-family: var(--font-mono);
-    font-size: clamp(0.72rem, 0.92vw, 0.82rem);
-    font-weight: 600;
-    letter-spacing: 0.28em;
+    font-size: clamp(0.68rem, 0.84vw, 0.76rem);
+    font-weight: 400;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
   }
 
-  .home-hero-kicker::before {
-    content: "// ";
-    color: rgba(168, 159, 145, 0.4);
-  }
-
-  .home-platform {
-    position: relative;
-    width: min(100%, 36rem);
-    margin: 2.4rem auto 0;
-    perspective: 900px;
-    filter:
-      drop-shadow(0 18px 26px rgba(8, 8, 7, 0.55))
-      drop-shadow(0 6px 10px rgba(8, 8, 7, 0.4));
-  }
-
-  .home-platform-face {
-    position: relative;
-    display: grid;
-    gap: 0.45rem;
-    background:
-      linear-gradient(
-        180deg,
-        rgba(244, 238, 222, 0.97) 0%,
-        rgba(220, 211, 190, 0.93) 100%
-      );
-    clip-path: polygon(9% 0, 91% 0, 100% 100%, 0 100%);
-    padding: 1.55rem 2.4rem 1.55rem;
-    text-align: center;
-  }
-
-  .home-platform-face::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 9%;
-    right: 9%;
-    height: 1px;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 250, 240, 0.7) 50%,
-      transparent
-    );
-  }
-
-  .home-platform-face p {
-    margin: 0;
-    color: rgba(12, 10, 8, 0.85);
-    font-family: var(--font-display);
-    font-size: clamp(0.9rem, 1vw, 1rem);
+  .home-hero-bio {
+    margin: 1.8rem 0 0;
+    max-width: 32rem;
+    color: rgba(168, 159, 145, 0.78);
+    font-family: var(--font-mono);
+    font-size: clamp(0.8rem, 0.94vw, 0.88rem);
     font-weight: 400;
-    letter-spacing: 0;
-    line-height: 1.5;
-    text-wrap: balance;
+    line-height: 1.88;
+    text-wrap: pretty;
   }
 
-  .home-platform-edge {
-    height: 1.05rem;
-    margin-top: -1px;
-    background: linear-gradient(
-      180deg,
-      rgba(62, 50, 32, 0.96) 0%,
-      rgba(24, 19, 12, 0.98) 100%
-    );
-    clip-path: polygon(0 0, 100% 0, 92% 100%, 8% 100%);
-  }
 
   .section-header {
     display: flex;
@@ -424,11 +373,11 @@
   }
 
   .section-name--link:hover {
-    color: rgba(236, 230, 216, 1);
+    color: rgba(255, 79, 154, 0.82);
   }
 
   .section-name--link:hover::after {
-    color: rgba(236, 230, 216, 0.95);
+    color: rgba(255, 79, 154, 0.65);
     transform: translateX(3px);
   }
 
@@ -449,7 +398,7 @@
   }
 
   .specimen-card--link:hover {
-    border-color: rgba(236, 230, 216, 0.32);
+    border-color: rgba(255, 79, 154, 0.22);
     background: linear-gradient(180deg, #1c1915 0%, #12100d 100%);
   }
 
@@ -571,11 +520,54 @@
     color: rgba(168, 159, 145, 0.94);
   }
 
+  .hero-cv-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.48rem;
+    height: 3.4rem;
+    padding: 0 1.4rem;
+    border: 1px solid rgba(236, 230, 216, 0.2);
+    border-radius: 999px;
+    background: rgba(236, 230, 216, 0.07);
+    color: rgba(236, 230, 216, 0.92);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition:
+      color 120ms ease,
+      background-color 160ms ease,
+      border-color 160ms ease,
+      transform 160ms ease;
+  }
+
+  .hero-cv-btn:hover {
+    border-color: rgba(255, 79, 154, 0.38);
+    background: rgba(255, 79, 154, 0.08);
+    color: rgba(255, 79, 154, 0.9);
+    transform: translateY(-1px);
+  }
+
+  .hero-cv-btn:focus-visible {
+    outline: 1.5px solid rgba(255, 79, 154, 0.55);
+    outline-offset: 4px;
+  }
+
+  .hero-cv-icon {
+    width: 1.18rem;
+    height: 1.18rem;
+    flex: 0 0 auto;
+  }
+
   .home-hero-actions {
     display: flex;
-    justify-content: center;
-    gap: 0.7rem;
-    margin-top: 1.4rem;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 2.2rem;
   }
 
   .cv-link {
@@ -716,8 +708,8 @@
     padding: 0.2rem 0 0.1rem;
   }
 
-  .footer-toggle,
-  .hero-action {
+  /* Footer toggle — icon-only circle */
+  .footer-toggle {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -735,11 +727,10 @@
       transform 160ms ease;
   }
 
-  .footer-toggle:hover,
-  .hero-action:hover {
-    border-color: rgba(236, 230, 216, 0.36);
-    background: rgba(236, 230, 216, 0.14);
-    color: rgba(236, 230, 216, 1);
+  .footer-toggle:hover {
+    border-color: rgba(255, 79, 154, 0.38);
+    background: rgba(255, 79, 154, 0.08);
+    color: rgba(255, 79, 154, 0.9);
     transform: translateY(-1px);
   }
 
@@ -749,16 +740,57 @@
     color: rgba(236, 230, 216, 1);
   }
 
-  .footer-toggle:focus-visible,
-  .hero-action:focus-visible {
-    outline: 1.5px solid rgba(236, 230, 216, 0.5);
+  .footer-toggle:focus-visible {
+    outline: 1.5px solid rgba(255, 79, 154, 0.55);
     outline-offset: 4px;
   }
 
-  .footer-toggle-icon,
-  .hero-action-icon {
+  .footer-toggle-icon {
     width: 1.45rem;
     height: 1.45rem;
+    flex: 0 0 auto;
+  }
+
+  /* Hero action — pill with icon + "let's talk" label */
+  .hero-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    height: 3.4rem;
+    padding: 0 1.4rem;
+    border: 1px solid rgba(236, 230, 216, 0.2);
+    border-radius: 999px;
+    background: rgba(236, 230, 216, 0.07);
+    color: rgba(236, 230, 216, 0.92);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: lowercase;
+    cursor: pointer;
+    transition:
+      color 120ms ease,
+      background-color 160ms ease,
+      border-color 160ms ease,
+      transform 160ms ease;
+  }
+
+  .hero-action:hover {
+    border-color: rgba(255, 79, 154, 0.38);
+    background: rgba(255, 79, 154, 0.08);
+    color: rgba(255, 79, 154, 0.9);
+    transform: translateY(-1px);
+  }
+
+  .hero-action:focus-visible {
+    outline: 1.5px solid rgba(255, 79, 154, 0.55);
+    outline-offset: 4px;
+  }
+
+  .hero-action-icon {
+    width: 1.18rem;
+    height: 1.18rem;
     flex: 0 0 auto;
   }
 
@@ -876,9 +908,9 @@
   }
 
   .footer-button:hover {
-    border-color: rgba(236, 230, 216, 0.4);
-    background: rgba(236, 230, 216, 0.14);
-    color: rgba(236, 230, 216, 1);
+    border-color: rgba(255, 79, 154, 0.38);
+    background: rgba(255, 79, 154, 0.08);
+    color: rgba(255, 79, 154, 0.9);
   }
 
   .footer-links-wrap {
@@ -906,8 +938,8 @@
   }
 
   .footer-icon-link:hover {
-    color: rgba(236, 230, 216, 0.98);
-    background: rgba(236, 230, 216, 0.08);
+    color: rgba(255, 79, 154, 0.85);
+    background: rgba(255, 79, 154, 0.07);
   }
 
   .footer-icon {
@@ -993,49 +1025,25 @@
         );
     }
 
-    .site-header {
-      padding-top: 0.15rem;
-    }
-
+    /* Compact hanging tabs on small screens */
     .poster-nav {
-      width: 100%;
-      justify-content: space-between;
-      gap: 0.35rem;
-      border-radius: 1rem;
-      background: rgba(8, 8, 7, 0.88);
-      padding: 0.55rem 0.78rem;
+      gap: 2px;
     }
 
     .poster-nav-link {
-      font-size: 1rem;
+      padding: 0.22rem 0.7rem 0.42rem;
+      font-size: 0.72rem;
       letter-spacing: 0.04em;
     }
 
-    .poster-nav-link--active::after {
-      bottom: -0.18rem;
+    .poster-nav-link--active {
+      padding-bottom: 1rem;
     }
 
     .home-hero {
-      min-height: 28rem;
-      padding-top: 2.5rem;
-    }
-
-    .home-hero-inner {
-      max-width: 100%;
-      padding: 2rem 1rem 1.8rem;
-    }
-
-    .home-hero-inner::before,
-    .home-hero-inner::after {
-      width: 12px;
-      height: 12px;
-    }
-
-    .hero-meta-strip {
-      gap: 0.4rem;
-      font-size: 0.62rem;
-      letter-spacing: 0.18em;
-      margin-bottom: 1.4rem;
+      min-height: 42vh;
+      padding-block: 2.4rem 3rem;
+      margin-top: 1rem;
     }
 
     .home-hero-title {
@@ -1101,46 +1109,6 @@
     .spec-section-flow,
     .spec-section-list {
       font-size: 0.82rem;
-    }
-
-    .home-platform {
-      width: 100%;
-      margin-top: 2rem;
-      filter:
-        drop-shadow(0 12px 18px rgba(8, 8, 7, 0.55))
-        drop-shadow(0 4px 6px rgba(8, 8, 7, 0.4));
-    }
-
-    .home-platform-face {
-      clip-path: polygon(8% 0, 92% 0, 100% 100%, 0 100%);
-      gap: 0.4rem;
-      padding: 1.3rem 1.55rem 1.35rem;
-    }
-
-    .home-platform-face::before {
-      left: 8%;
-      right: 8%;
-    }
-
-    .home-platform-face p {
-      font-size: clamp(0.88rem, 3.7vw, 0.98rem);
-      line-height: 1.42;
-    }
-
-    .home-platform-edge {
-      height: 0.95rem;
-      clip-path: polygon(0 0, 100% 0, 93% 100%, 7% 100%);
-    }
-
-    .cv-link {
-      height: 2.4rem;
-      padding: 0 0.95rem;
-      font-size: 0.78rem;
-    }
-
-    .cv-link-icon {
-      width: 0.9rem;
-      height: 0.9rem;
     }
 
     .footer-button {

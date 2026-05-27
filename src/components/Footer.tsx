@@ -143,10 +143,6 @@ function Footer() {
           </nav>
         </div>
 
-        <a className="back-to-top" href="#top">
-          ↑ back to top
-        </a>
-
         <p className="footer-bottom-line">
           <span>Pedro Coelho</span>
           <span className="footer-bottom-line-sep">·</span>
