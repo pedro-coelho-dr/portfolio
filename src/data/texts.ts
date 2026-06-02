@@ -2,23 +2,27 @@ import type { PortfolioItem } from './projects'
 
 export const texts: PortfolioItem[] = [
   {
-    description: 'Short technical notes on model behavior, security posture, and applied use.',
-    eyebrow: 'notes',
-    meta: ['AI', 'security', 'research'],
+    description: 'Philosophical reading of AI through Hannah Arendt — agents, identity, and what remains human.',
+    eyebrow: 'essay',
+    meta: ['AI', 'philosophy', 'agents'],
     title: 'Notes on AI',
-    tone: 'amber',
+    to: '/text/notes-on-ai',
+    tone: 'pink',
   },
   {
-    description: 'Coursework report and observations from OWASP Juice Shop lab exercises.',
-    eyebrow: 'lab report',
-    meta: ['OWASP', 'web security', 'report'],
+    description: 'Web application pentest report — OWASP Top 10 identification, CWE mapping, CVSS scoring.',
+    eyebrow: 'pentest report',
+    meta: ['OWASP', 'web security', 'Burp Suite'],
     title: 'OWASP Juice Shop',
-    tone: 'red',
+    to: '/text/juice-shop',
+    tone: 'pink',
   },
   {
-    description: 'Android security lab notes focused on weak patterns and remediation.',
-    eyebrow: 'mobile lab',
-    meta: ['Android', 'security', 'writeup'],
+    description: 'Android pentest report — OWASP Mobile Top 10, dynamic analysis with Frida and MobSF.',
+    eyebrow: 'mobile pentest',
+    meta: ['Android', 'MobSF', 'Frida'],
     title: 'InsecureBankv2',
+    to: '/text/insecurebankv2',
+    tone: 'pink',
   },
 ]

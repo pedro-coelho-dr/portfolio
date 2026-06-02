@@ -2,29 +2,27 @@ import type { PortfolioItem } from './projects'
 
 export const code: PortfolioItem[] = [
   {
-    description: 'Speech and text workflow prototype for transcription and language analysis.',
+    description: 'Semantic similarity word game for Portuguese — guess the secret word by meaning, not by spelling.',
     eyebrow: 'applied AI',
-    meta: ['NLP', 'audio', 'prototype'],
+    meta: ['FastAPI', 'Word2Vec', 'Docker'],
     title: 'Verbalyst',
+    to: '/code/verbalyst',
     tone: 'amber',
   },
   {
-    description: 'Machine learning intrusion detection study with compact feature pipelines.',
+    description: 'Supervised learning study for network intrusion detection on the NSL-KDD dataset.',
     eyebrow: 'ml security',
-    meta: ['ML', 'IDS', 'Python'],
+    meta: ['Python', 'scikit-learn', 'NSL-KDD'],
     title: 'ML-IDS',
-    tone: 'red',
+    to: '/code/ml-ids',
+    tone: 'amber',
   },
   {
-    description: 'Markdown output helper for turning rough notes into cleaner deliverables.',
-    eyebrow: 'writing tool',
-    meta: ['Markdown', 'CLI', 'docs'],
+    description: 'CLI tool that captures piped command output to Markdown while printing to the terminal.',
+    eyebrow: 'cli tool',
+    meta: ['Go', 'CLI', 'Markdown'],
     title: 'mdout',
-  },
-  {
-    description: 'Benchmark harness for testing LLM behavior on spam classification tasks.',
-    eyebrow: 'evaluation',
-    meta: ['LLM', 'benchmark', 'data'],
-    title: 'LLM Spam Benchmark',
+    to: '/code/mdout',
+    tone: 'amber',
   },
 ]

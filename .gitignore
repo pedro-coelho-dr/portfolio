@@ -25,5 +25,11 @@ dist-ssr
 
 .codex/
 .agents/
+.claude/
 
 AGENTS.md
+
+.GLHF/
+.references/
+
+public/glhf/cv.pdf
