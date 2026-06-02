@@ -25,8 +25,6 @@ export type Detail = {
   sections: Section[]
 }
 
-const GH = 'https://raw.githubusercontent.com/pedro-coelho-dr/vuln-webapp-report/main/img/'
-
 const details: Detail[] = [
   // ── PROJECTS ───────────────────────────────────────────────
 
