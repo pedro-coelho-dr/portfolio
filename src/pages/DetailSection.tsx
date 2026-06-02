@@ -81,6 +81,15 @@ function DetailSection() {
     headingRef.current?.focus()
   }, [slug])
 
+  // Reflect the open entry in the document title; restore the default on close.
+  useEffect(() => {
+    if (!item) return
+    document.title = `${item.title} — Pedro Coelho`
+    return () => {
+      document.title = 'Pedro Coelho — offsec · dev · ai'
+    }
+  }, [item])
+
   if (!item) {
     return (
       <section className="detail-band" aria-label="Detail">

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { Outlet, useLocation, useMatch, useNavigate } from 'react-router-dom'
+import { Link, Outlet, useLocation, useMatch, useNavigate } from 'react-router-dom'
 
+import HeroWeb from '../components/HeroWeb'
 import VisualCard from '../components/VisualCard'
 import { CONTACT_EMAIL, CONTACT_PHONE, CONTACT_WHATSAPP } from '../data/contact'
 import { code } from '../data/code'
@@ -93,6 +94,7 @@ function Home() {
   return (
     <>
       <section className="home-hero">
+        <HeroWeb />
         <div className="home-hero-inner page-shell">
           <img
             alt="Pedro Coelho logo"
@@ -218,17 +220,17 @@ function Home() {
             {tab === 'project' ? (
               <>
                 <article
-                  aria-label={`View ${featured.title} project`}
                   className={`home-feature${paused ? ' is-paused' : ''}${activeSlug && featuredHref.endsWith(`/${activeSlug}`) ? ' is-active' : ''}`}
                   onBlur={() => setPaused(false)}
-                  onClick={() => navigate(featuredHref)}
                   onFocus={() => setPaused(true)}
-                  onKeyDown={(e) => { if (e.key === 'Enter') navigate(featuredHref) }}
                   onMouseEnter={() => setPaused(true)}
                   onMouseLeave={() => setPaused(false)}
-                  role="link"
-                  tabIndex={0}
                 >
+                  <Link
+                    aria-label={`View ${featured.title} project`}
+                    className="home-feature__link"
+                    to={featuredHref}
+                  />
                   <div className="home-feature__stage">
                     <div className="home-feature__frames">
                       {Array.from({ length: FEATURE_FRAMES }, (_, i) => {

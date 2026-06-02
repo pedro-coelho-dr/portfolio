@@ -38,7 +38,6 @@
   }
 
   html {
-    scroll-behavior: smooth;
     background: var(--color-background);
     /* Always reserve the scrollbar gutter so content width never changes
        when navigating between short and tall pages. Without this, any page
@@ -66,6 +65,43 @@
   select {
     font: inherit;
   }
+
+  /* Smooth scrolling only when the user hasn't asked to reduce motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  /* Consistent keyboard focus ring across every interactive element. */
+  :focus-visible {
+    outline: 2px solid rgba(236, 230, 216, 0.7);
+    outline-offset: 3px;
+    border-radius: 1px;
+  }
+
+  /* Skip-to-content link — visually hidden until focused. */
+  .skip-link {
+    position: fixed;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 100;
+    padding: 0.55rem 0.9rem;
+    background: var(--color-elevated);
+    border: 1px solid var(--color-border);
+    color: var(--color-primary-text);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: lowercase;
+    transform: translateY(-150%);
+    transition: transform 160ms ease;
+  }
+
+  .skip-link:focus-visible {
+    transform: translateY(0);
+    outline-offset: 2px;
+  }
 }
 
 @layer components {
@@ -77,41 +113,36 @@
     background: var(--color-background);
   }
 
-  .poster-rays {
+  /* Ambient backdrop — a faint fixed grid plus an edge vignette for depth,
+     behind all content. Sections below the hero are semi-transparent so this
+     reads through; the hero stays opaque with its own constellation web. */
+  .poster-atmosphere {
     position: fixed;
     z-index: 0;
     inset: 0;
     pointer-events: none;
-    --ray-rotation: 0deg;
-    background:
-      repeating-conic-gradient(
-        from calc(-18deg + var(--ray-rotation)) at 50% 0%,
-        rgba(236, 230, 216, 0.052) 0deg 8deg,
-        transparent 8deg 24deg
-      );
+    background-image:
+      linear-gradient(rgba(236, 230, 216, 0.022) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(236, 230, 216, 0.018) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+
+  .poster-atmosphere::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      135% 90% at 50% 0%,
+      transparent 52%,
+      rgba(8, 8, 7, 0.6) 100%
+    );
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .poster-rays {
-      --ray-rotation: 0deg !important;
-    }
-
     .home-feature__frame {
       transition-duration: 120ms !important;
       transform: none !important;
     }
-  }
-
-  .poster-rays::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(rgba(236, 230, 216, 0.02) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(236, 230, 216, 0.015) 1px, transparent 1px);
-    background-size: 22px 22px;
-    mix-blend-mode: normal;
-    opacity: 0.08;
   }
 
   /* ── Hero entry animation ────────────────────────────────── */
@@ -190,6 +221,30 @@
     min-height: clamp(22rem, 48vh, 34rem);
     padding-block: clamp(2.4rem, 4vw, 3.6rem) clamp(2.4rem, 3.5vw, 3.2rem);
     background: var(--color-background);
+    overflow: hidden;
+  }
+
+  /* Interactive constellation web — sits behind the hero content. Masked on a
+     slight diagonal so it reads strongest in the open right side and fades to
+     nothing behind the left-aligned title/text, keeping copy legible. */
+  .hero-web {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    display: block;
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(
+      105deg,
+      transparent 0%,
+      rgba(0, 0, 0, 0.22) 36%,
+      #000 66%
+    );
+    mask-image: linear-gradient(
+      105deg,
+      transparent 0%,
+      rgba(0, 0, 0, 0.22) 36%,
+      #000 66%
+    );
   }
 
   .section-band {
@@ -198,7 +253,9 @@
     margin-top: clamp(0.8rem, 1.4vw, 1.2rem);
     margin-bottom: 0;
     padding-block: clamp(2.6rem, 5vw, 3.8rem);
-    background: var(--color-surface);
+    /* Semi-transparent so the ambient grid reads through, while the surface
+       tint keeps this band lifted above the darker hero/detail. */
+    background: rgba(20, 18, 15, 0.7);
   }
 
   main > .section-band:first-child {
@@ -206,6 +263,8 @@
   }
 
   .home-hero-inner {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -266,43 +325,6 @@
     text-wrap: pretty;
   }
 
-
-  .page-header {
-    display: grid;
-    gap: 0.65rem;
-    margin: 0 0 1.8rem;
-  }
-
-  .page-header-title {
-    margin: 0;
-    font-family: var(--font-display);
-    font-size: clamp(2rem, 4.4vw, 3rem);
-    font-weight: 700;
-    letter-spacing: -0.035em;
-    line-height: 0.96;
-    text-transform: lowercase;
-    color: rgba(236, 230, 216, 0.98);
-  }
-
-  .page-header-tagline {
-    margin: 0;
-    max-width: 44rem;
-    font-family: var(--font-display);
-    font-size: clamp(1rem, 1.25vw, 1.12rem);
-    font-weight: 400;
-    line-height: 1.45;
-    color: rgba(168, 159, 145, 0.92);
-  }
-
-  .page-header-eyebrow {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: rgba(168, 159, 145, 0.45);
-  }
-
   /* ── Detail page ─────────────────────────────────────────────── */
 
   /*
@@ -311,7 +333,7 @@
    * against the surface-toned works band above it, echoing the hero/footer.
    */
   .detail-band {
-    background: var(--color-background);
+    background: rgba(8, 8, 7, 0.55);
     border-top: 1px solid rgba(236, 230, 216, 0.06);
     padding-block: clamp(2rem, 4vw, 3.4rem) clamp(3rem, 6vw, 5rem);
     animation: detail-band-reveal 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -483,7 +505,7 @@
     font-weight: 600;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: rgba(168, 159, 145, 0.42);
+    color: rgba(170, 161, 147, 0.56);
   }
 
   .detail-spec-val {
@@ -491,7 +513,7 @@
     font-family: var(--font-mono);
     font-size: 0.74rem;
     letter-spacing: 0.02em;
-    color: rgba(190, 182, 170, 0.82);
+    color: rgba(196, 188, 176, 0.9);
   }
 
   /* Body */
@@ -602,7 +624,7 @@
     font-family: var(--font-mono);
     font-size: 0.63rem;
     letter-spacing: 0.06em;
-    color: rgba(168, 159, 145, 0.36);
+    color: rgba(170, 161, 147, 0.5);
     border-top: 1px solid rgba(236, 230, 216, 0.06);
   }
 
@@ -1029,96 +1051,6 @@
     color: rgba(168, 159, 145, 0.76);
   }
 
-  .spec-list {
-    display: grid;
-    gap: 0;
-    margin: 0 0 2.6rem;
-    padding: 0;
-    border-top: 1px solid rgba(236, 230, 216, 0.1);
-  }
-
-  .spec-row {
-    display: grid;
-    grid-template-columns: 8rem 1fr;
-    gap: 1.2rem;
-    align-items: baseline;
-    padding: 0.6rem 0;
-    border-bottom: 1px dashed rgba(236, 230, 216, 0.1);
-  }
-
-  .spec-key {
-    margin: 0;
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: rgba(168, 159, 145, 0.55);
-  }
-
-  .spec-value {
-    margin: 0;
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
-    font-weight: 500;
-    letter-spacing: 0.02em;
-    color: rgba(236, 230, 216, 0.92);
-    line-height: 1.4;
-  }
-
-  .spec-section {
-    margin: 0 0 2.8rem;
-    padding-left: 1rem;
-    border-left: 1px solid rgba(236, 230, 216, 0.08);
-  }
-
-  .spec-section-title {
-    margin: 0 0 0.8rem;
-    font-family: var(--font-mono);
-    font-size: 0.82rem;
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: rgba(236, 230, 216, 0.92);
-  }
-
-  .spec-section-marker {
-    margin-right: 0.55rem;
-    color: var(--color-amber);
-    opacity: 0.6;
-  }
-
-  .spec-section-flow,
-  .spec-section-list {
-    margin: 0;
-    font-family: var(--font-mono);
-    font-size: 0.88rem;
-    font-weight: 400;
-    line-height: 1.55;
-    color: rgba(168, 159, 145, 0.92);
-  }
-
-  .spec-prose {
-    margin: 2.4rem 0 0;
-    max-width: 44rem;
-    font-family: var(--font-display);
-    font-size: 1rem;
-    font-weight: 400;
-    line-height: 1.55;
-    color: rgba(168, 159, 145, 0.94);
-  }
-
-  .spec-value-link {
-    color: rgba(236, 230, 216, 0.92);
-    border-bottom: 1px dashed rgba(168, 159, 145, 0.35);
-    transition: color 130ms ease, border-color 130ms ease;
-  }
-
-  .spec-value-link:hover {
-    color: rgba(245, 213, 71, 0.92);
-    border-bottom-color: rgba(245, 213, 71, 0.45);
-  }
-
   .spec-code {
     display: block;
     margin: 0;
@@ -1205,16 +1137,12 @@
     @apply mx-auto w-full max-w-6xl px-5;
   }
 
-  .page-section {
-    @apply py-12;
-  }
-
   /* ── Footer ──────────────────────────────────────────────────── */
 
   .footer-contact {
     margin-top: auto;
     border-top: 1px solid rgba(236, 230, 216, 0.06);
-    background: var(--color-background);
+    background: rgba(8, 8, 7, 0.5);
   }
 
   .footer-contact-inner {
@@ -1267,25 +1195,6 @@
   .hero-icon-svg {
     width: 1.25rem;
     height: 1.25rem;
-  }
-
-  .back-to-top {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    margin: 0.5rem auto 0;
-    padding: 0.35rem 0.6rem;
-    font-family: var(--font-mono);
-    font-size: 0.64rem;
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: rgba(168, 159, 145, 0.6);
-    transition: color 120ms ease;
-  }
-
-  .back-to-top:hover {
-    color: rgba(236, 230, 216, 0.96);
   }
 
   .footer-bottom-line {
@@ -1348,9 +1257,6 @@
     @apply mt-8 grid grid-cols-1 gap-4 md:grid-cols-3;
   }
 
-  .visual-field {
-    @apply mt-10 overflow-hidden border border-border bg-background;
-  }
 
   /* ── Home · featured project bar (GLHF) ───────────────────── */
 
@@ -1368,6 +1274,14 @@
     transition:
       border-color 280ms ease,
       box-shadow 280ms ease;
+  }
+
+  /* Stretched link covers the whole card; the indicator dots (z-index 3) stay
+     above it so they remain independently clickable. */
+  .home-feature__link {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
   }
 
   .home-feature.is-active {
@@ -1689,12 +1603,6 @@
       margin-top: 0.7rem;
     }
 
-    .page-header {
-      gap: 0.55rem;
-      margin-bottom: 1.5rem;
-      padding-bottom: 0.8rem;
-    }
-
     .specimen-card-info {
       gap: 0.4rem;
       padding: 0.8rem 0.9rem 0.95rem;
@@ -1713,28 +1621,9 @@
       line-height: 1.4;
     }
 
-    .spec-row {
+    .detail-spec-row {
       grid-template-columns: 6rem 1fr;
       gap: 0.9rem;
-    }
-
-    .spec-key {
-      font-size: 0.64rem;
-      letter-spacing: 0.16em;
-    }
-
-    .spec-value {
-      font-size: 0.8rem;
-    }
-
-    .spec-section-title {
-      font-size: 0.74rem;
-      letter-spacing: 0.16em;
-    }
-
-    .spec-section-flow,
-    .spec-section-list {
-      font-size: 0.82rem;
     }
 
     .detail-image-grid {

@@ -9,7 +9,8 @@ function App() {
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       <PosterShell>
         <div id="top" className="flex min-h-screen flex-col text-primary-text">
-          <main>
+          <a className="skip-link" href="#main">skip to content</a>
+          <main id="main">
             <Routes>
               {/*
                 Home is a layout route; the detail views are nested children
