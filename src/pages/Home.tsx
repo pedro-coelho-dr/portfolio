@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Outlet, useLocation, useMatch, useNavigate } from 'react-router-dom'
 
 import VisualCard from '../components/VisualCard'
 import { CONTACT_EMAIL, CONTACT_PHONE, CONTACT_WHATSAPP } from '../data/contact'
@@ -26,29 +26,54 @@ function Home() {
 
   const location = useLocation()
   const navigate = useNavigate()
-  const [tab, setTab] = useState<Tab>(() => tabFromHash(location.hash))
 
-  useEffect(() => {
-    const next = tabFromHash(location.hash)
-    setTab((current) => (current === next ? current : next))
-  }, [location.hash])
+  // A detail view (project/code/text) is rendered through <Outlet/> as a nested
+  // route. When one is open we derive the active tab from its category so the
+  // grid above the detail stays in sync.
+  const detailMatch = useMatch('/:category/:slug')
+  const detailCategory = detailMatch?.params.category
+  const activeSlug = detailMatch?.params.slug
+
+  // The active tab is fully derived from the URL: an open detail dictates its
+  // category, otherwise the hash. No local state needed.
+  const tab: Tab =
+    detailCategory && (TABS as readonly string[]).includes(detailCategory)
+      ? (detailCategory as Tab)
+      : tabFromHash(location.hash)
 
   function selectTab(next: Tab) {
     if (next === tab) return
-    navigate({ hash: `#${next}` })
+    // Switching tabs always returns to the grid (closes any open detail).
+    navigate({ pathname: '/', hash: `#${next}` })
   }
 
   const sectionRef = useRef<HTMLElement>(null)
+  const detailRef = useRef<HTMLDivElement>(null)
 
   // On first mount, if a tab hash is present scroll to the works section
   useEffect(() => {
     const hash = location.hash.replace(/^#/, '')
-    if ((TABS as readonly string[]).includes(hash) && sectionRef.current) {
+    if ((TABS as readonly string[]).includes(hash) && !activeSlug && sectionRef.current) {
       const el = sectionRef.current
       setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Smooth-scroll to the detail when it opens (or switches), and back to the
+  // works grid when it closes — the page feels like one continuous surface.
+  const prevSlug = useRef<string | undefined>(undefined)
+  useEffect(() => {
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    const behavior: ScrollBehavior = reduce ? 'auto' : 'smooth'
+    if (activeSlug && activeSlug !== prevSlug.current) {
+      const el = detailRef.current
+      if (el) setTimeout(() => el.scrollIntoView({ behavior, block: 'start' }), 60)
+    } else if (!activeSlug && prevSlug.current) {
+      sectionRef.current?.scrollIntoView({ behavior, block: 'start' })
+    }
+    prevSlug.current = activeSlug
+  }, [activeSlug])
 
   const [expanded, setExpanded] = useState(false)
   const [active, setActive] = useState(0)
@@ -194,7 +219,7 @@ function Home() {
               <>
                 <article
                   aria-label={`View ${featured.title} project`}
-                  className={`home-feature${paused ? ' is-paused' : ''}`}
+                  className={`home-feature${paused ? ' is-paused' : ''}${activeSlug && featuredHref.endsWith(`/${activeSlug}`) ? ' is-active' : ''}`}
                   onBlur={() => setPaused(false)}
                   onClick={() => navigate(featuredHref)}
                   onFocus={() => setPaused(true)}
@@ -256,7 +281,7 @@ function Home() {
                 {projects.length > 1 ? (
                   <div className="card-grid tab-panel__grid-spacer">
                     {projects.slice(1).map((item) => (
-                      <VisualCard key={item.title} {...item} />
+                      <VisualCard key={item.title} activeSlug={activeSlug} {...item} />
                     ))}
                   </div>
                 ) : null}
@@ -266,7 +291,7 @@ function Home() {
             {tab === 'code' ? (
               <div className="card-grid">
                 {code.map((item) => (
-                  <VisualCard key={item.title} {...item} />
+                  <VisualCard key={item.title} activeSlug={activeSlug} {...item} />
                 ))}
               </div>
             ) : null}
@@ -274,13 +299,17 @@ function Home() {
             {tab === 'text' ? (
               <div className="card-grid">
                 {texts.map((item) => (
-                  <VisualCard key={item.title} {...item} />
+                  <VisualCard key={item.title} activeSlug={activeSlug} {...item} />
                 ))}
               </div>
             ) : null}
           </div>
         </div>
       </section>
+
+      <div ref={detailRef}>
+        <Outlet />
+      </div>
     </>
   )
 }

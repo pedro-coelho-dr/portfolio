@@ -1,5 +1,11 @@
-import { Link, useParams } from 'react-router-dom'
+import { useEffect, useRef } from 'react'
+import { useParams } from 'react-router-dom'
 import { detailMap, type Block } from '../data/detail'
+
+function scrollToTop() {
+  const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  window.scrollTo({ top: 0, left: 0, behavior: reduce ? 'auto' : 'smooth' })
+}
 
 function renderBlock(block: Block, base: string, key: number, isLead: boolean, showImages: boolean) {
   switch (block.type) {
@@ -56,51 +62,54 @@ function renderBlock(block: Block, base: string, key: number, isLead: boolean, s
   }
 }
 
-function DetailPage() {
+/**
+ * Inline detail view. Rendered through Home's <Outlet/> as a new band beneath
+ * the works grid, so opening a project/code/text entry keeps the SPA surface
+ * intact rather than swapping to a standalone page. The back link returns to
+ * the home grid (Home handles the smooth scroll on close).
+ */
+function DetailSection() {
   const { slug } = useParams<{ slug: string }>()
   const base = import.meta.env.BASE_URL
   const item = slug ? detailMap[slug] : undefined
   const showImages = slug === 'glhf'
 
+  // Move keyboard focus to the detail heading when it opens, so screen-reader
+  // and keyboard users land on the freshly revealed content.
+  const headingRef = useRef<HTMLHeadingElement>(null)
+  useEffect(() => {
+    headingRef.current?.focus()
+  }, [slug])
+
   if (!item) {
     return (
-      <div className="detail-page">
+      <section className="detail-band" aria-label="Detail">
         <div className="page-shell">
-          <Link className="page-back-link" to="/">← back</Link>
-          <p className="detail-p">Page not found.</p>
+          <p className="detail-p">Entry not found.</p>
         </div>
-      </div>
+      </section>
     )
   }
 
   let globalBlockIndex = 0
 
   return (
-    <div className="detail-page">
+    <section className="detail-band" aria-label={`${item.title} detail`}>
       <div className="page-shell">
-        <Link className="page-back-link" to={`/#${item.category}`}>
-          ← back
-        </Link>
-
         <article className="detail-article" data-tone={item.tone ?? 'neutral'}>
           <header className="detail-header">
-            <div className="detail-header-top">
-              <span className="detail-eyebrow">
-                <span aria-hidden="true" className="detail-eyebrow-dot" />
-                {item.eyebrow}
-              </span>
-              <ul className="detail-meta-chips">
-                {item.meta.map((m) => (
-                  <li key={m.key}>{m.value}</li>
-                ))}
-              </ul>
-            </div>
+            <span className="detail-eyebrow">
+              <span aria-hidden="true" className="detail-eyebrow-rule" />
+              {item.eyebrow}
+            </span>
 
-            <h1 className="detail-title">{item.title}</h1>
+            <h1 className="detail-title" ref={headingRef} tabIndex={-1}>
+              {item.title}
+            </h1>
             <p className="detail-tagline">{item.tagline}</p>
 
             {item.links.length > 0 ? (
-              <div className="detail-links-bar">
+              <div className="detail-links">
                 {item.links.map((link) => (
                   <a
                     key={link.label}
@@ -117,6 +126,17 @@ function DetailPage() {
             ) : null}
           </header>
 
+          {item.meta.length > 0 ? (
+            <dl className="detail-spec">
+              {item.meta.map((m) => (
+                <div className="detail-spec-row" key={m.key}>
+                  <dt className="detail-spec-key">{m.key}</dt>
+                  <dd className="detail-spec-val">{m.value}</dd>
+                </div>
+              ))}
+            </dl>
+          ) : null}
+
           <div className="detail-body">
             {item.sections.map((section, si) => (
               <section key={si} className="detail-section">
@@ -131,10 +151,18 @@ function DetailPage() {
               </section>
             ))}
           </div>
+
+          <footer className="detail-foot">
+            <button className="detail-totop" onClick={scrollToTop} type="button">
+              <span aria-hidden="true" className="detail-totop-rule" />
+              back to top
+              <span aria-hidden="true" className="detail-totop-arrow">↑</span>
+            </button>
+          </footer>
         </article>
       </div>
-    </div>
+    </section>
   )
 }
 
-export default DetailPage
+export default DetailSection

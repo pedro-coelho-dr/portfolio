@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 
 type VisualCardProps = {
+  activeSlug?: string
   description?: string
   eyebrow?: string
   index?: number
@@ -10,11 +11,17 @@ type VisualCardProps = {
   tone?: 'amber' | 'neutral' | 'pink' | 'red'
 }
 
-function VisualCard({ description, eyebrow, meta, title, to, tone }: VisualCardProps) {
+function VisualCard({ activeSlug, description, eyebrow, meta, title, to, tone }: VisualCardProps) {
   const target = to ?? '/project/glhf'
+  const isActive = Boolean(activeSlug) && target.endsWith(`/${activeSlug}`)
 
   return (
-    <Link className="specimen-card specimen-card--link" data-tone={tone ?? 'neutral'} to={target}>
+    <Link
+      aria-current={isActive ? 'true' : undefined}
+      className={`specimen-card specimen-card--link${isActive ? ' is-active' : ''}`}
+      data-tone={tone ?? 'neutral'}
+      to={target}
+    >
       <div aria-hidden="true" className="specimen-card-image" />
       <div className="specimen-card-info">
         {eyebrow ? (

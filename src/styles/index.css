@@ -187,8 +187,8 @@
     display: flex;
     align-items: flex-start;
     margin-top: 0;
-    min-height: clamp(44vh, 56vh, 68vh);
-    padding-block: clamp(2.4rem, 4vw, 3.6rem) clamp(2.8rem, 5vw, 4.2rem);
+    min-height: clamp(22rem, 48vh, 34rem);
+    padding-block: clamp(2.4rem, 4vw, 3.6rem) clamp(2.4rem, 3.5vw, 3.2rem);
     background: var(--color-background);
   }
 
@@ -273,26 +273,6 @@
     margin: 0 0 1.8rem;
   }
 
-  .page-back-link {
-    display: inline-flex;
-    align-items: center;
-    margin-bottom: 1.2rem;
-    color: rgba(236, 230, 216, 0.55);
-    font-family: var(--font-mono);
-    font-size: clamp(0.74rem, 0.88vw, 0.84rem);
-    letter-spacing: 0.16em;
-    text-transform: lowercase;
-    border-bottom: 1px solid rgba(236, 230, 216, 0.15);
-    padding-bottom: 1px;
-    transition: color 130ms ease, border-color 130ms ease, transform 160ms ease;
-  }
-
-  .page-back-link:hover {
-    color: rgba(245, 213, 71, 0.9);
-    border-bottom-color: rgba(245, 213, 71, 0.35);
-    transform: translateX(-3px);
-  }
-
   .page-header-title {
     margin: 0;
     font-family: var(--font-display);
@@ -325,10 +305,33 @@
 
   /* ── Detail page ─────────────────────────────────────────────── */
 
-  .detail-page {
+  /*
+   * Inline detail band — unfolds beneath the works grid (rendered through
+   * Home's <Outlet/>). Uses the page background to read as a distinct section
+   * against the surface-toned works band above it, echoing the hero/footer.
+   */
+  .detail-band {
     background: var(--color-background);
-    padding-block: clamp(1.8rem, 3.5vw, 3rem) clamp(4rem, 8vw, 7rem);
-    min-height: 100vh;
+    border-top: 1px solid rgba(236, 230, 216, 0.06);
+    padding-block: clamp(2rem, 4vw, 3.4rem) clamp(3rem, 6vw, 5rem);
+    animation: detail-band-reveal 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes detail-band-reveal {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .detail-band {
+      animation: none;
+    }
   }
 
   .detail-article {
@@ -368,175 +371,182 @@
     --detail-badge-dot:     rgba(255, 79, 154, 0.9);
   }
 
-  /* Header */
+  /* Header — typographic hierarchy over boxed chrome */
 
   .detail-header {
-    border-top: 2px solid var(--detail-accent);
-    padding-top: 1.8rem;
-    margin-bottom: 3.2rem;
+    margin-bottom: 2.4rem;
   }
 
-  .detail-header-top {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 0.75rem 1.5rem;
-    margin-bottom: 1.8rem;
-  }
-
+  /* "— eyebrow" marker, echoing the hero kicker rule */
   .detail-eyebrow {
     display: inline-flex;
     align-items: center;
-    gap: 0.42rem;
-    padding: 0.22rem 0.65rem 0.22rem 0.5rem;
-    border: 1px solid var(--detail-badge-border);
-    border-radius: 999px;
-    background: var(--detail-badge-bg);
+    gap: 0.7rem;
+    margin-bottom: 1.4rem;
     font-family: var(--font-mono);
-    font-size: 0.64rem;
+    font-size: 0.66rem;
     font-weight: 600;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
     color: var(--detail-badge-color);
   }
 
-  .detail-eyebrow-dot {
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--detail-badge-dot);
+  .detail-eyebrow-rule {
+    display: block;
+    width: 1.6rem;
+    height: 2px;
+    background: var(--detail-accent);
     flex-shrink: 0;
   }
 
-  .detail-meta-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.3rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .detail-meta-chips li {
-    padding: 0.18rem 0.52rem;
-    border: 1px solid rgba(168, 159, 145, 0.12);
-    border-radius: 3px;
-    background: rgba(168, 159, 145, 0.04);
-    font-family: var(--font-mono);
-    font-size: 0.63rem;
-    letter-spacing: 0.05em;
-    color: rgba(168, 159, 145, 0.52);
-    text-transform: lowercase;
-  }
-
   .detail-title {
-    margin: 0 0 0.8rem;
+    margin: 0 0 0.7rem;
     font-family: var(--font-display);
-    font-size: clamp(2.4rem, 5.8vw, 4.2rem);
+    font-size: clamp(2.6rem, 6vw, 4.4rem);
     font-weight: 700;
-    letter-spacing: -0.042em;
-    line-height: 0.93;
+    letter-spacing: -0.044em;
+    line-height: 0.92;
     text-transform: lowercase;
-    color: rgba(236, 230, 216, 0.98);
+    color: rgba(236, 230, 216, 0.99);
   }
 
   .detail-tagline {
-    margin: 0 0 1.6rem;
-    max-width: 44rem;
+    margin: 0;
+    max-width: 40rem;
     font-family: var(--font-display);
-    font-size: clamp(1rem, 1.35vw, 1.16rem);
+    font-size: clamp(1.05rem, 1.4vw, 1.22rem);
     font-weight: 400;
-    line-height: 1.55;
-    color: rgba(200, 192, 180, 0.8);
+    line-height: 1.5;
+    color: rgba(206, 198, 186, 0.82);
   }
 
-  .detail-links-bar {
+  .detail-links {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.45rem;
+    gap: 1.3rem;
+    margin-top: 1.5rem;
   }
 
   .detail-link-item {
     display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    padding: 0.46rem 1rem;
-    border: 1px solid var(--detail-badge-border);
-    border-radius: 2px;
-    background: var(--detail-badge-bg);
+    align-items: baseline;
+    gap: 0.34rem;
+    padding-bottom: 2px;
+    border-bottom: 1px solid transparent;
     font-family: var(--font-mono);
-    font-size: 0.67rem;
+    font-size: 0.7rem;
     font-weight: 600;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.12em;
     text-transform: lowercase;
-    color: var(--detail-badge-color);
-    transition: background 180ms ease, border-color 180ms ease, color 180ms ease;
+    color: rgba(168, 159, 145, 0.62);
+    transition: color 180ms ease, border-color 180ms ease;
   }
 
   .detail-link-item:hover {
-    background: var(--detail-accent-faint);
-    border-color: var(--detail-badge-border);
     color: var(--detail-badge-color);
-    opacity: 1;
+    border-bottom-color: var(--detail-accent);
   }
 
   .detail-link-arrow {
     font-style: normal;
-    font-size: 0.78rem;
-    opacity: 0.7;
+    font-size: 0.82rem;
+    transition: transform 180ms ease;
+  }
+
+  .detail-link-item:hover .detail-link-arrow {
+    transform: translate(2px, -2px);
+  }
+
+  /* Spec strip — compact technical datasheet, hairline-ruled */
+  .detail-spec {
+    margin: 0 0 3rem;
+    max-width: 40rem;
+    border-top: 1px solid var(--detail-accent-faint);
+    border-bottom: 1px solid var(--detail-accent-faint);
+  }
+
+  .detail-spec-row {
+    display: grid;
+    grid-template-columns: 7rem 1fr;
+    gap: 1rem;
+    align-items: baseline;
+    padding: 0.62rem 0;
+  }
+
+  .detail-spec-row + .detail-spec-row {
+    border-top: 1px solid rgba(236, 230, 216, 0.04);
+  }
+
+  .detail-spec-key {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(168, 159, 145, 0.42);
+  }
+
+  .detail-spec-val {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.02em;
+    color: rgba(190, 182, 170, 0.82);
   }
 
   /* Body */
 
   .detail-body {
-    max-width: 44rem;
+    max-width: 40rem;
   }
 
   .detail-section {
-    margin-bottom: 2.8rem;
+    margin-bottom: 3rem;
+  }
+
+  .detail-section:last-child {
+    margin-bottom: 0;
   }
 
   .detail-h2 {
     display: flex;
     align-items: center;
     gap: 0.7rem;
-    margin: 0 0 1.1rem;
+    margin: 0 0 1.2rem;
     font-family: var(--font-mono);
-    font-size: 0.68rem;
+    font-size: 0.66rem;
     font-weight: 700;
-    letter-spacing: 0.24em;
+    letter-spacing: 0.26em;
     text-transform: uppercase;
     color: var(--detail-badge-color);
-    opacity: 0.72;
+    opacity: 0.85;
   }
 
   .detail-h2::before {
     content: '';
     display: block;
-    width: 1.4rem;
-    height: 1px;
+    width: 1.1rem;
+    height: 2px;
     background: var(--detail-accent);
     flex-shrink: 0;
-    opacity: 0.8;
   }
 
   .detail-lead {
-    margin: 0 0 1.6rem;
+    margin: 0 0 1.5rem;
     font-family: var(--font-display);
-    font-size: clamp(1.04rem, 1.28vw, 1.15rem);
+    font-size: clamp(1.08rem, 1.3vw, 1.2rem);
     font-weight: 400;
-    line-height: 1.82;
-    color: rgba(212, 204, 192, 0.97);
+    line-height: 1.7;
+    color: rgba(216, 208, 196, 0.97);
   }
 
   .detail-p {
-    margin: 0 0 1.4rem;
+    margin: 0 0 1.3rem;
     font-family: var(--font-display);
-    font-size: clamp(0.95rem, 1.05vw, 1.02rem);
+    font-size: clamp(0.97rem, 1.05vw, 1.04rem);
     font-weight: 400;
-    line-height: 1.9;
-    color: rgba(178, 170, 158, 0.96);
+    line-height: 1.74;
+    color: rgba(182, 174, 162, 0.96);
   }
 
   .detail-p:last-child,
@@ -606,6 +616,58 @@
 
   .detail-image-grid .detail-image {
     margin: 0;
+  }
+
+  /* Footer — back-to-top, echoing the hero "— more" rule-grows motif */
+  .detail-foot {
+    margin-top: 3.4rem;
+    padding-top: 1.6rem;
+    border-top: 1px solid var(--detail-accent-faint);
+  }
+
+  .detail-totop {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 0.64rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: lowercase;
+    color: rgba(168, 159, 145, 0.45);
+    transition: color 180ms ease;
+  }
+
+  .detail-totop-rule {
+    display: block;
+    width: 1.6rem;
+    height: 1px;
+    background: currentColor;
+    flex-shrink: 0;
+    transition: width 240ms ease, background 180ms ease;
+  }
+
+  .detail-totop-arrow {
+    font-style: normal;
+    font-size: 0.82rem;
+    transition: transform 200ms ease;
+  }
+
+  .detail-totop:hover {
+    color: var(--detail-badge-color);
+  }
+
+  .detail-totop:hover .detail-totop-rule {
+    width: 2.4rem;
+    background: var(--detail-accent);
+  }
+
+  .detail-totop:hover .detail-totop-arrow {
+    transform: translateY(-3px);
   }
 
   /* ── Section tab bar — sliding pill with spring physics ─────── */
@@ -773,6 +835,35 @@
   .specimen-card--link[data-tone="pink"]:hover {
     border-color: rgba(255, 79, 154, 0.28);
     box-shadow: 0 16px 44px rgba(0, 0, 0, 0.48), 0 0 0 1px rgba(255, 79, 154, 0.1);
+  }
+
+  /* Active card — its detail is open in the band below. Persistent accent
+     ring plus a marker rule that points down toward the revealed section. */
+  .specimen-card.is-active,
+  .home-feature.is-active {
+    --active-accent: rgba(236, 230, 216, 0.5);
+  }
+  .specimen-card.is-active[data-tone="red"],
+  .home-feature.is-active[data-tone="red"] { --active-accent: rgba(229, 72, 77, 0.85); }
+  .specimen-card.is-active[data-tone="amber"],
+  .home-feature.is-active[data-tone="amber"] { --active-accent: rgba(245, 213, 71, 0.85); }
+  .specimen-card.is-active[data-tone="pink"],
+  .home-feature.is-active[data-tone="pink"] { --active-accent: rgba(255, 79, 154, 0.85); }
+
+  .specimen-card.is-active {
+    border-color: var(--active-accent);
+    box-shadow: 0 16px 44px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--active-accent);
+  }
+
+  .specimen-card.is-active::after {
+    content: '';
+    position: absolute;
+    left: 1.1rem;
+    bottom: -1px;
+    width: 2.2rem;
+    height: 2px;
+    background: var(--active-accent);
+    box-shadow: 0 0 12px var(--active-accent);
   }
 
   .specimen-card-image {
@@ -1138,14 +1229,14 @@
   .hero-cv-link {
     display: inline-flex;
     align-items: center;
-    gap: 0.28rem;
-    height: 1.9rem;
-    padding: 0 0.65rem;
+    gap: 0.3rem;
+    height: 2.25rem;
+    padding: 0 0.8rem;
     border: 1px solid rgba(236, 230, 216, 0.13);
     background: transparent;
     color: rgba(168, 159, 145, 0.62);
     font-family: var(--font-mono);
-    font-size: 0.7rem;
+    font-size: 0.78rem;
     font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: lowercase;
@@ -1162,8 +1253,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 1.9rem;
-    height: 1.9rem;
+    width: 2.25rem;
+    height: 2.25rem;
     border: none;
     color: rgba(168, 159, 145, 0.36);
     transition: color 180ms ease;
@@ -1174,8 +1265,8 @@
   }
 
   .hero-icon-svg {
-    width: 1.05rem;
-    height: 1.05rem;
+    width: 1.25rem;
+    height: 1.25rem;
   }
 
   .back-to-top {
@@ -1228,29 +1319,29 @@
 
   .footer-links {
     display: flex;
-    gap: 0.7rem;
+    gap: 0.3rem;
     justify-content: center;
   }
 
+  /* Bare icon links — mirror the hero contact row: no pill, low-opacity
+     neutral that warms on hover (no pink). The icon carries the interaction. */
   .footer-icon-link {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 2.9rem;
-    height: 2.9rem;
-    border-radius: 999px;
-    color: rgba(236, 230, 216, 0.86);
-    background: rgba(236, 230, 216, 0.04);
+    width: 2.4rem;
+    height: 2.4rem;
+    color: rgba(168, 159, 145, 0.36);
+    transition: color 180ms ease;
   }
 
   .footer-icon-link:hover {
-    color: rgba(255, 79, 154, 0.85);
-    background: rgba(255, 79, 154, 0.07);
+    color: rgba(168, 159, 145, 0.7);
   }
 
   .footer-icon {
-    width: 1.45rem;
-    height: 1.45rem;
+    width: 1.25rem;
+    height: 1.25rem;
   }
 
   .card-grid {
@@ -1277,6 +1368,23 @@
     transition:
       border-color 280ms ease,
       box-shadow 280ms ease;
+  }
+
+  .home-feature.is-active {
+    border-color: var(--active-accent);
+    box-shadow: 0 32px 72px rgba(0, 0, 0, 0.55), 0 0 0 1px var(--active-accent);
+  }
+
+  .home-feature.is-active::after {
+    content: '';
+    position: absolute;
+    left: 1.6rem;
+    bottom: -1px;
+    width: 2.6rem;
+    height: 2px;
+    background: var(--active-accent);
+    box-shadow: 0 0 12px var(--active-accent);
+    z-index: 2;
   }
 
   .home-feature:hover {
