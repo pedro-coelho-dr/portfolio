@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import { Link, Outlet, useLocation, useMatch, useNavigate } from 'react-router-dom'
 
 import HeroWeb from '../components/HeroWeb'
@@ -48,8 +48,52 @@ function Home() {
     navigate({ pathname: '/', hash: `#${next}` })
   }
 
+  // Roving-focus keyboard support for the tablist (ARIA tabs pattern): arrow
+  // keys move and activate the adjacent tab, Home/End jump to the ends.
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
+  function onTabKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
+    const i = TABS.indexOf(tab)
+    let next: number | null = null
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (i + 1) % TABS.length
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (i - 1 + TABS.length) % TABS.length
+    else if (e.key === 'Home') next = 0
+    else if (e.key === 'End') next = TABS.length - 1
+    if (next === null) return
+    e.preventDefault()
+    selectTab(TABS[next])
+    tabRefs.current[next]?.focus()
+  }
+
   const sectionRef = useRef<HTMLElement>(null)
   const detailRef = useRef<HTMLDivElement>(null)
+  const worksRef = useRef<HTMLDivElement>(null)
+
+  // Reveal-once on scroll via IntersectionObserver — cross-browser and never
+  // leaves content stranded at opacity:0 (replaces the Chromium-only
+  // animation-timeline:view() approach). Re-runs per tab so freshly shown
+  // panels animate in; honours prefers-reduced-motion (CSS shows them statically).
+  useEffect(() => {
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
+    const root = worksRef.current
+    if (!root) return
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            // Mark via a data attribute, not a class: React owns className and
+            // rewrites it on any re-render (hover→paused, detail open→is-active),
+            // which would wipe an imperatively-added class. React leaves
+            // attributes it didn't set in JSX alone, so this survives re-renders.
+            entry.target.setAttribute('data-revealed', '')
+            io.unobserve(entry.target)
+          }
+        }
+      },
+      { threshold: 0.12 },
+    )
+    root.querySelectorAll('.reveal').forEach((el) => io.observe(el))
+    return () => io.disconnect()
+  }, [tab])
 
   // On first mount, if a tab hash is present scroll to the works section
   useEffect(() => {
@@ -133,7 +177,7 @@ function Home() {
           </button>
           <div className="home-hero-actions">
             <div className="hero-actions-row">
-              <a aria-label="Download CV" className="hero-cv-link" href={cvHref}>
+              <a aria-label="Download CV" className="hero-cv-link" download href={cvHref}>
                 cv
                 <span aria-hidden="true">↓</span>
               </a>
@@ -186,24 +230,29 @@ function Home() {
       </section>
 
       <section className="section-band" ref={sectionRef}>
-        <div className="page-shell">
+        <div className="page-shell" ref={worksRef}>
+          <h2 className="sr-only" id="works-heading">Selected works</h2>
           <div
-            aria-label="Sections"
+            aria-labelledby="works-heading"
             className="tab-bar"
+            onKeyDown={onTabKeyDown}
             role="tablist"
             style={{
               ['--tab-index' as string]: TABS.indexOf(tab),
               ['--tab-color' as string]: tab === 'project' ? '#e5484d' : tab === 'code' ? '#f5d547' : '#ff4f9a',
             } as React.CSSProperties}
           >
-            {TABS.map((t) => (
+            {TABS.map((t, i) => (
               <button
                 aria-controls={`tab-panel-${t}`}
                 aria-selected={t === tab}
                 className={`tab-bar-btn${t === tab ? ' tab-bar-btn--active' : ''}`}
+                id={`tab-${t}`}
                 key={t}
                 onClick={() => selectTab(t)}
+                ref={(el) => { tabRefs.current[i] = el }}
                 role="tab"
+                tabIndex={t === tab ? 0 : -1}
                 type="button"
               >
                 {t}
@@ -211,106 +260,120 @@ function Home() {
             ))}
           </div>
 
+          {/* All three panels render so each tab's aria-controls resolves to a
+              real element; inactive panels are hidden. The reveal animation
+              replays whenever a panel un-hides (display none → block). */}
           <div
+            aria-labelledby="tab-project"
             className="tab-panel"
-            id={`tab-panel-${tab}`}
-            key={tab}
+            hidden={tab !== 'project'}
+            id="tab-panel-project"
             role="tabpanel"
           >
-            {tab === 'project' ? (
-              <>
-                <article
-                  className={`home-feature${paused ? ' is-paused' : ''}${activeSlug && featuredHref.endsWith(`/${activeSlug}`) ? ' is-active' : ''}`}
-                  onBlur={() => setPaused(false)}
-                  onFocus={() => setPaused(true)}
-                  onMouseEnter={() => setPaused(true)}
-                  onMouseLeave={() => setPaused(false)}
+            <article
+              className={`home-feature reveal${paused ? ' is-paused' : ''}${activeSlug && featuredHref.endsWith(`/${activeSlug}`) ? ' is-active' : ''}`}
+              data-tone={featured.tone ?? 'neutral'}
+              onBlur={() => setPaused(false)}
+              onFocus={() => setPaused(true)}
+              onMouseEnter={() => setPaused(true)}
+              onMouseLeave={() => setPaused(false)}
+            >
+              <Link
+                aria-labelledby="home-feature-title"
+                className="home-feature__link"
+                to={featuredHref}
+              />
+              <div className="home-feature__stage">
+                <div className="home-feature__frames">
+                  {Array.from({ length: FEATURE_FRAMES }, (_, i) => {
+                    const id = String(i + 1).padStart(2, '0')
+                    return (
+                      <div
+                        aria-hidden={i !== active}
+                        className={`home-feature__frame${i === active ? ' is-active' : ''}`}
+                        key={i}
+                        style={{ backgroundImage: `url(${base}img/glhf/${id}.png)` }}
+                      />
+                    )
+                  })}
+                </div>
+                <div
+                  aria-label="Screenshot"
+                  className="home-feature__dots"
+                  role="group"
                 >
-                  <Link
-                    aria-label={`View ${featured.title} project`}
-                    className="home-feature__link"
-                    to={featuredHref}
-                  />
-                  <div className="home-feature__stage">
-                    <div className="home-feature__frames">
-                      {Array.from({ length: FEATURE_FRAMES }, (_, i) => {
-                        const id = String(i + 1).padStart(2, '0')
-                        return (
-                          <div
-                            aria-hidden={i !== active}
-                            className={`home-feature__frame${i === active ? ' is-active' : ''}`}
-                            key={i}
-                            style={{ backgroundImage: `url(${base}img/glhf/${id}.png)` }}
-                          />
-                        )
-                      })}
-                    </div>
-                    <div
-                      aria-label="Screenshot indicator"
-                      className="home-feature__dots"
-                      role="tablist"
+                  {Array.from({ length: FEATURE_FRAMES }, (_, i) => (
+                    <button
+                      aria-label={`Show screenshot ${i + 1}`}
+                      aria-pressed={i === active}
+                      className={`home-feature__dot${i === active ? ' is-active' : ''}`}
+                      key={i}
+                      onClick={(e) => { e.stopPropagation(); setActive(i) }}
+                      type="button"
                     >
-                      {Array.from({ length: FEATURE_FRAMES }, (_, i) => (
-                        <button
-                          aria-label={`Show screenshot ${i + 1}`}
-                          aria-selected={i === active}
-                          className={`home-feature__dot${i === active ? ' is-active' : ''}`}
-                          key={i}
-                          onClick={(e) => { e.stopPropagation(); setActive(i) }}
-                          role="tab"
-                          type="button"
-                        >
-                          <span aria-hidden="true" className="home-feature__dot-fill" />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="home-feature__info">
-                    <span className="home-feature__eyebrow">
-                      <span aria-hidden="true" className="home-feature__eyebrow-dot" />
-                      {featured.eyebrow}
-                    </span>
-                    <h3 className="home-feature__title">{featured.title}</h3>
-                    <p className="home-feature__summary">{featured.description}</p>
-                    <ul className="home-feature__meta">
-                      {featured.meta.map((tag) => (
-                        <li key={tag}>{tag}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </article>
-
-                {projects.length > 1 ? (
-                  <div className="card-grid tab-panel__grid-spacer">
-                    {projects.slice(1).map((item) => (
-                      <VisualCard key={item.title} activeSlug={activeSlug} {...item} />
-                    ))}
-                  </div>
-                ) : null}
-              </>
-            ) : null}
-
-            {tab === 'code' ? (
-              <div className="card-grid">
-                {code.map((item) => (
-                  <VisualCard key={item.title} activeSlug={activeSlug} {...item} />
-                ))}
+                      <span aria-hidden="true" className="home-feature__dot-fill" />
+                    </button>
+                  ))}
+                </div>
               </div>
-            ) : null}
+              <div className="home-feature__info">
+                <span className="home-feature__eyebrow">
+                  <span aria-hidden="true" className="home-feature__eyebrow-dot" />
+                  {featured.eyebrow}
+                </span>
+                <h3 className="home-feature__title" id="home-feature-title">{featured.title}</h3>
+                <p className="home-feature__summary">{featured.description}</p>
+                <ul className="home-feature__meta">
+                  {featured.meta.map((tag) => (
+                    <li key={tag}>{tag}</li>
+                  ))}
+                </ul>
+              </div>
+            </article>
 
-            {tab === 'text' ? (
-              <div className="card-grid">
-                {texts.map((item) => (
+            {projects.length > 1 ? (
+              <div className="card-grid tab-panel__grid-spacer">
+                {projects.slice(1).map((item) => (
                   <VisualCard key={item.title} activeSlug={activeSlug} {...item} />
                 ))}
               </div>
             ) : null}
           </div>
+
+          <div
+            aria-labelledby="tab-code"
+            className="tab-panel"
+            hidden={tab !== 'code'}
+            id="tab-panel-code"
+            role="tabpanel"
+          >
+            <div className="card-grid">
+              {code.map((item) => (
+                <VisualCard key={item.title} activeSlug={activeSlug} {...item} />
+              ))}
+            </div>
+          </div>
+
+          <div
+            aria-labelledby="tab-text"
+            className="tab-panel"
+            hidden={tab !== 'text'}
+            id="tab-panel-text"
+            role="tabpanel"
+          >
+            <div className="card-grid">
+              {texts.map((item) => (
+                <VisualCard key={item.title} activeSlug={activeSlug} {...item} />
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
       <div ref={detailRef}>
-        <Outlet />
+        <Suspense fallback={null}>
+          <Outlet />
+        </Suspense>
       </div>
     </>
   )

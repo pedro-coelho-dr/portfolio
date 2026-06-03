@@ -2,9 +2,11 @@ export type Block =
   | { type: 'p'; content: string }
   | { type: 'code'; lang?: string; content: string }
   | { type: 'ul'; items: string[] }
-  | { type: 'img'; src: string; alt?: string; caption?: string; external?: boolean }
-  | { type: 'imgs'; items: { src: string; alt?: string; external?: boolean }[] }
-  | { type: 'video'; src: string; caption?: string; external?: boolean }
+  // w/h are the image's intrinsic pixel dimensions — rendered as width/height
+  // attributes so the browser reserves space and avoids layout shift (CLS).
+  | { type: 'img'; src: string; alt?: string; caption?: string; external?: boolean; w?: number; h?: number }
+  | { type: 'imgs'; items: { src: string; alt?: string; external?: boolean; w?: number; h?: number }[] }
+  | { type: 'video'; src: string; caption?: string; external?: boolean; wide?: boolean }
 
 export type Section = {
   title?: string
@@ -21,6 +23,8 @@ export type Detail = {
   eyebrow: string
   tagline: string
   tone?: 'amber' | 'neutral' | 'pink' | 'red'
+  /** Marks the entry's body as Portuguese — sets lang on the rendered article. */
+  lang?: 'pt-br'
   meta: MetaRow[]
   links: Link[]
   sections: Section[]
@@ -67,10 +71,10 @@ const details: Detail[] = [
           {
             type: 'imgs',
             items: [
-              { src: 'img/glhf/01.png', alt: 'Lobby — login and 2FA screens' },
-              { src: 'img/glhf/02.png', alt: 'User — profile management' },
-              { src: 'img/glhf/03.png', alt: 'Board — forum interface' },
-              { src: 'img/glhf/04.png', alt: 'Direct — messaging' },
+              { src: 'img/glhf/01.png', alt: 'Lobby — login and 2FA screens', w: 1600, h: 900 },
+              { src: 'img/glhf/02.png', alt: 'User — profile management', w: 1600, h: 900 },
+              { src: 'img/glhf/03.png', alt: 'Board — forum interface', w: 1600, h: 900 },
+              { src: 'img/glhf/04.png', alt: 'Direct — messaging', w: 1600, h: 900 },
             ],
           },
         ],
@@ -218,6 +222,11 @@ const details: Detail[] = [
             content:
               'DevOpsCool is an educational assistant that guides learners through DevOps and Cloud Computing as a connected ecosystem rather than isolated topics. Content is laid out as a hierarchical roadmap — from foundations to advanced cloud architectures — and an AI tutor offers context-aware guidance, practical examples, and study suggestions tailored to the node you are currently exploring.',
           },
+          {
+            type: 'video',
+            src: 'video/devopscool/demo.mp4',
+            wide: true,
+          },
         ],
       },
       {
@@ -360,6 +369,8 @@ const details: Detail[] = [
             src: 'img/llm-spam-benchmark/model-comparison.png',
             alt: 'Performance comparison across the benchmarked models',
             caption: 'Performance comparison across the benchmarked models',
+            w: 984,
+            h: 584,
           },
         ],
       },
@@ -437,6 +448,23 @@ const details: Detail[] = [
               'All models exceeded 0.98 validation accuracy, dropping to 0.71–0.76 on test — the signature of overfitting to seen attack classes',
               'Minority classes (U2R, R2L) showed poor recall across all models despite high validation metrics',
               'Core insight: 15 unseen attack classes in KDDTest+ systematically broke all models, regardless of algorithm choice',
+            ],
+          },
+          {
+            type: 'imgs',
+            items: [
+              {
+                src: 'img/ml-ids/randomforest.png',
+                alt: 'Random Forest — KDDTest+',
+                w: 504,
+                h: 490,
+              },
+              {
+                src: 'img/ml-ids/mlp.png',
+                alt: 'Multilayer Perceptron — KDDTest+',
+                w: 517,
+                h: 490,
+              },
             ],
           },
         ],
@@ -571,6 +599,27 @@ const details: Detail[] = [
           },
         ],
       },
+      {
+        title: 'dashboards',
+        blocks: [
+          {
+            type: 'img',
+            src: 'img/cve-etl-project/cve_occur.png',
+            alt: 'CVE occurrences over time',
+            caption: 'CVE occurrences over time',
+            w: 3229,
+            h: 964,
+          },
+          {
+            type: 'img',
+            src: 'img/cve-etl-project/vendor.png',
+            alt: 'Vulnerabilities by vendor',
+            caption: 'Vulnerabilities by vendor',
+            w: 1882,
+            h: 1034,
+          },
+        ],
+      },
     ],
   },
 
@@ -583,6 +632,7 @@ const details: Detail[] = [
     eyebrow: 'ensaio',
     tagline: 'Agentes e a condição humana',
     tone: 'pink',
+    lang: 'pt-br',
     meta: [],
     links: [
       {

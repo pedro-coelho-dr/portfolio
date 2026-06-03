@@ -1,8 +1,13 @@
+import { lazy } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Footer from './components/Footer'
 import PosterShell from './components/PosterShell'
-import DetailSection from './pages/DetailSection'
 import Home from './pages/Home'
+
+// Code-split the detail view: it (and its large data module `detail.ts`, which
+// carries the full essay text) loads only when a detail route is opened, keeping
+// the initial bundle lean. Home wraps the <Outlet/> in a <Suspense> boundary.
+const DetailSection = lazy(() => import('./pages/DetailSection'))
 
 function App() {
   return (

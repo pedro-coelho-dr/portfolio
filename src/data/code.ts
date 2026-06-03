@@ -11,6 +11,7 @@ export const code: PortfolioItem[] = [
     tone: 'amber',
   },
   {
+    avatar: 'img/ml-ids/avatar.png',
     description: 'Supervised learning study for network intrusion detection on the NSL-KDD dataset.',
     eyebrow: 'ml security',
     meta: ['Python', 'scikit-learn', 'NSL-KDD'],
@@ -19,6 +20,7 @@ export const code: PortfolioItem[] = [
     tone: 'amber',
   },
   {
+    avatar: 'img/mdout/avatar.png',
     description: 'CLI tool that captures piped command output to Markdown while printing to the terminal.',
     eyebrow: 'cli tool',
     meta: ['Go', 'CLI', 'Markdown'],
@@ -27,6 +29,7 @@ export const code: PortfolioItem[] = [
     tone: 'amber',
   },
   {
+    avatar: 'img/cve-etl-project/avatar.png',
     description: 'ETL pipeline and data warehouse for analyzing CVE vulnerability trends, visualized in Metabase.',
     eyebrow: 'data engineering',
     meta: ['Python', 'PostgreSQL', 'Metabase'],

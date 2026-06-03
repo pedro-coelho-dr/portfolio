@@ -173,19 +173,9 @@
     animation-delay: 170ms;
   }
 
-  .home-hero-divider {
-    animation: fade-up 0.5s ease both;
-    animation-delay: 220ms;
-  }
-
   .home-hero-bio-lead {
     animation: fade-up 0.5s ease both;
     animation-delay: 280ms;
-  }
-
-  .home-hero-bio {
-    animation: fade-up 0.5s ease both;
-    animation-delay: 340ms;
   }
 
   .home-hero-actions {
@@ -193,18 +183,11 @@
     animation-delay: 420ms;
   }
 
-  @keyframes scroll-cue {
-    0%, 100% { opacity: 0.32; transform: translateX(-50%) translateY(0); }
-    50%       { opacity: 0.52; transform: translateX(-50%) translateY(4px); }
-  }
-
   @media (prefers-reduced-motion: reduce) {
     .home-hero-logo,
     .home-hero-title,
     .home-hero-kicker,
-    .home-hero-divider,
     .home-hero-bio-lead,
-    .home-hero-bio,
     .home-hero-actions {
       animation: none;
     }
@@ -432,6 +415,16 @@
     color: rgba(236, 230, 216, 0.99);
   }
 
+  /* Focus moves here programmatically when a detail opens (a11y). The display
+     title is large, so override the global 2px/3px ring with a thin, hugging
+     tone-coloured outline instead of a hard box. */
+  .detail-title:focus-visible {
+    outline-width: 1px;
+    outline-offset: 2px;
+    outline-color: var(--detail-accent, rgba(236, 230, 216, 0.5));
+    border-radius: 2px;
+  }
+
   .detail-tagline {
     margin: 0;
     max-width: 40rem;
@@ -654,6 +647,30 @@
     height: auto;
   }
 
+  .detail-image-trigger {
+    display: block;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    background: none;
+    cursor: zoom-in;
+    color: inherit;
+  }
+
+  .detail-image-trigger img {
+    transition: opacity 0.2s ease;
+  }
+
+  .detail-image-trigger:hover img {
+    opacity: 0.88;
+  }
+
+  .detail-image-trigger:focus-visible {
+    outline: 1px solid rgba(236, 230, 216, 0.4);
+    outline-offset: 2px;
+  }
+
   .detail-caption {
     padding: 0.48rem 0.75rem;
     font-family: var(--font-mono);
@@ -675,6 +692,91 @@
     margin: 0;
   }
 
+  /* Lightbox — focused full-bleed preview for any body image */
+  .detail-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(1.5rem, 5vw, 4rem);
+    background: rgba(8, 7, 6, 0.86);
+    backdrop-filter: blur(6px);
+    cursor: zoom-out;
+    animation: detail-lightbox-in 0.18s ease;
+  }
+
+  @keyframes detail-lightbox-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .detail-lightbox-figure {
+    margin: 0;
+    max-width: min(92vw, 64rem);
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(236, 230, 216, 0.12);
+    background: #0d0b09;
+    cursor: default;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+    animation: detail-lightbox-rise 0.2s ease;
+  }
+
+  @keyframes detail-lightbox-rise {
+    from {
+      transform: translateY(8px) scale(0.985);
+    }
+    to {
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .detail-lightbox-figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 84vh;
+    object-fit: contain;
+  }
+
+  .detail-lightbox-caption {
+    padding: 0.55rem 0.8rem;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.06em;
+    color: rgba(170, 161, 147, 0.6);
+    border-top: 1px solid rgba(236, 230, 216, 0.08);
+  }
+
+  .detail-lightbox-close {
+    position: fixed;
+    top: clamp(1rem, 3vw, 2rem);
+    right: clamp(1rem, 3vw, 2rem);
+    width: 2.4rem;
+    height: 2.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(236, 230, 216, 0.18);
+    background: rgba(13, 11, 9, 0.8);
+    color: rgba(236, 230, 216, 0.8);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .detail-lightbox-close:hover {
+    border-color: rgba(236, 230, 216, 0.4);
+    color: rgb(236, 230, 216);
+  }
+
   /* Portrait mobile capture — kept gif-sized so the low-res source isn't
      upscaled past where it looks crisp */
   .detail-video {
@@ -682,6 +784,12 @@
     max-width: 20rem;
     overflow: hidden;
     background: #0d0b09;
+  }
+
+  /* Landscape gif-like capture — wider, framed like the body images */
+  .detail-video-wide {
+    max-width: 54rem;
+    border: 1px solid rgba(236, 230, 216, 0.08);
   }
 
   .detail-video video {
@@ -744,6 +852,57 @@
     transform: translateY(-3px);
   }
 
+  /* Designed "not found" state for unknown slugs — editorial, with a way back. */
+  .detail-notfound {
+    max-width: 42rem;
+    padding-block: clamp(1rem, 3vw, 2.5rem);
+  }
+
+  .detail-notfound .detail-title {
+    margin-top: 0.4rem;
+  }
+
+  .detail-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 1.8rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: lowercase;
+    color: var(--detail-badge-color, rgba(168, 159, 145, 0.8));
+    transition: color 180ms ease;
+  }
+
+  .detail-back-arrow {
+    font-style: normal;
+    font-size: 0.82rem;
+    transition: transform 200ms ease;
+  }
+
+  .detail-back-rule {
+    display: block;
+    width: 1.6rem;
+    height: 1px;
+    background: currentColor;
+    flex-shrink: 0;
+    transition: width 240ms ease;
+  }
+
+  .detail-back:hover {
+    color: var(--color-primary-text);
+  }
+
+  .detail-back:hover .detail-back-arrow {
+    transform: translateX(-3px);
+  }
+
+  .detail-back:hover .detail-back-rule {
+    width: 2.4rem;
+  }
+
   /* ── Section tab bar — sliding pill with spring physics ─────── */
   .tab-bar {
     position: relative;
@@ -777,7 +936,7 @@
     padding: 0.55rem 0.5rem 0.72rem;
     border: none;
     background: transparent;
-    color: rgba(168, 159, 145, 0.48);
+    color: rgba(168, 159, 145, 0.7);
     cursor: pointer;
     font-family: var(--font-mono);
     font-size: 0.72rem;
@@ -832,43 +991,26 @@
 
   /* ── Scroll-driven reveals ───────────────────────────────────── */
 
-  @keyframes scroll-reveal {
-    from {
+  /* Scroll-driven reveals — driven by an IntersectionObserver in Home.tsx that
+     adds .in-view once (cross-browser, and content is never stranded hidden:
+     under reduced motion the base state below simply isn't applied). */
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
       opacity: 0;
-      transform: translateY(32px);
+      transform: translateY(28px);
+      transition:
+        opacity 600ms ease,
+        transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
     }
-    to {
+
+    .reveal[data-revealed] {
       opacity: 1;
-      transform: translateY(0);
+      transform: none;
     }
-  }
 
-  @supports (animation-timeline: view()) {
-    @media (prefers-reduced-motion: no-preference) {
-      .home-feature {
-        animation: scroll-reveal linear both;
-        animation-timeline: view();
-        animation-range: entry 0% entry 20%;
-      }
-
-      .card-grid > *:nth-child(1) {
-        animation: scroll-reveal linear both;
-        animation-timeline: view();
-        animation-range: entry 0% entry 24%;
-      }
-
-      .card-grid > *:nth-child(2) {
-        animation: scroll-reveal linear both;
-        animation-timeline: view();
-        animation-range: entry 8% entry 32%;
-      }
-
-      .card-grid > *:nth-child(3) {
-        animation: scroll-reveal linear both;
-        animation-timeline: view();
-        animation-range: entry 16% entry 40%;
-      }
-    }
+    /* Cascade cards within a grid as they enter. */
+    .card-grid > .reveal:nth-child(2) { transition-delay: 80ms; }
+    .card-grid > .reveal:nth-child(3) { transition-delay: 160ms; }
   }
 
   .tab-panel__grid-spacer {
@@ -1142,7 +1284,7 @@
     font-family: var(--font-mono);
     font-size: 0.63rem;
     letter-spacing: 0.06em;
-    color: rgba(168, 159, 145, 0.58);
+    color: rgba(168, 159, 145, 0.7);
     text-transform: lowercase;
     transition: border-color 240ms ease, color 240ms ease;
   }
@@ -1186,7 +1328,7 @@
     padding: 0;
     border: none;
     background: transparent;
-    color: rgba(168, 159, 145, 0.38);
+    color: rgba(168, 159, 145, 0.55);
     font-family: var(--font-mono);
     font-size: 0.62rem;
     font-weight: 500;
@@ -1285,7 +1427,7 @@
     width: 2.25rem;
     height: 2.25rem;
     border: none;
-    color: rgba(168, 159, 145, 0.36);
+    color: rgba(168, 159, 145, 0.55);
     transition: color 180ms ease;
   }
 
@@ -1360,7 +1502,7 @@
     justify-content: center;
     width: 2.4rem;
     height: 2.4rem;
-    color: rgba(168, 159, 145, 0.36);
+    color: rgba(168, 159, 145, 0.55);
     transition: color 180ms ease;
   }
 
@@ -1685,7 +1827,7 @@
     font-family: var(--font-mono);
     font-size: 0.66rem;
     letter-spacing: 0.06em;
-    color: rgba(168, 159, 145, 0.6);
+    color: rgba(168, 159, 145, 0.7);
     text-transform: lowercase;
     transition: border-color 240ms ease, color 240ms ease;
   }

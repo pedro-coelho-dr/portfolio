@@ -29,6 +29,7 @@ export const projects: PortfolioItem[] = [
     tone: 'red',
   },
   {
+    avatar: 'img/devopscool/avatar.png',
     description: 'Interactive DevOps & Cloud learning roadmap with a context-aware AI tutor, deployed on AWS.',
     eyebrow: 'cloud · ai',
     meta: ['React', 'FastAPI', 'AWS'],

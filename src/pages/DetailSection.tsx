@@ -1,13 +1,22 @@
-import { useEffect, useRef } from 'react'
-import { useParams } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { Link, useParams } from 'react-router-dom'
 import { detailMap, type Block } from '../data/detail'
+
+type Lightbox = { src: string; alt: string }
 
 function scrollToTop() {
   const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
   window.scrollTo({ top: 0, left: 0, behavior: reduce ? 'auto' : 'smooth' })
 }
 
-function renderBlock(block: Block, base: string, key: number, isLead: boolean) {
+function renderBlock(
+  block: Block,
+  base: string,
+  key: number,
+  isLead: boolean,
+  onOpen: (img: Lightbox) => void,
+) {
   switch (block.type) {
     case 'p':
       return (
@@ -33,7 +42,13 @@ function renderBlock(block: Block, base: string, key: number, isLead: boolean) {
       const src = block.external ? block.src : `${base}${block.src}`
       return (
         <figure key={key} className="detail-image">
-          <img alt={block.alt ?? ''} loading="lazy" src={src} />
+          <button
+            className="detail-image-trigger"
+            onClick={() => onOpen({ src, alt: block.alt ?? '' })}
+            type="button"
+          >
+            <img alt={block.alt ?? ''} height={block.h} loading="lazy" src={src} width={block.w} />
+          </button>
           {block.caption ? (
             <figcaption className="detail-caption">{block.caption}</figcaption>
           ) : null}
@@ -43,7 +58,7 @@ function renderBlock(block: Block, base: string, key: number, isLead: boolean) {
     case 'video': {
       const src = block.external ? block.src : `${base}${block.src}`
       return (
-        <figure key={key} className="detail-video">
+        <figure key={key} className={block.wide ? 'detail-video detail-video-wide' : 'detail-video'}>
           <video
             autoPlay
             loop
@@ -66,7 +81,13 @@ function renderBlock(block: Block, base: string, key: number, isLead: boolean) {
             const src = img.external ? img.src : `${base}${img.src}`
             return (
               <figure key={i} className="detail-image">
-                <img alt={img.alt ?? ''} loading="lazy" src={src} />
+                <button
+                  className="detail-image-trigger"
+                  onClick={() => onOpen({ src, alt: img.alt ?? '' })}
+                  type="button"
+                >
+                  <img alt={img.alt ?? ''} height={img.h} loading="lazy" src={src} width={img.w} />
+                </button>
                 {img.alt ? (
                   <figcaption className="detail-caption">{img.alt}</figcaption>
                 ) : null}
@@ -90,6 +111,30 @@ function DetailSection() {
   const base = import.meta.env.BASE_URL
   const item = slug ? detailMap[slug] : undefined
 
+  // Lightbox for body images — click any image to open a focused overlay.
+  const [lightbox, setLightbox] = useState<Lightbox | null>(null)
+  useEffect(() => {
+    if (!lightbox) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setLightbox(null)
+    }
+    window.addEventListener('keydown', onKey)
+    document.body.style.overflow = 'hidden'
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.body.style.overflow = ''
+    }
+  }, [lightbox])
+
+  // Close the lightbox when the open entry changes — done during render (React's
+  // "reset state when a prop changes" pattern) rather than in an effect, which
+  // avoids the cascading-render lint and an extra paint showing a stale overlay.
+  const [prevSlug, setPrevSlug] = useState(slug)
+  if (slug !== prevSlug) {
+    setPrevSlug(slug)
+    setLightbox(null)
+  }
+
   // Move keyboard focus to the detail heading when it opens, so screen-reader
   // and keyboard users land on the freshly revealed content.
   const headingRef = useRef<HTMLHeadingElement>(null)
@@ -97,20 +142,60 @@ function DetailSection() {
     headingRef.current?.focus()
   }, [slug])
 
-  // Reflect the open entry in the document title; restore the default on close.
+  // Reflect the open entry in the document title + social/meta tags; restore the
+  // page defaults on close. Without SSG these benefit JS-executing consumers (the
+  // browser tab, Google) and keep a single canonical tag rather than duplicates.
   useEffect(() => {
-    if (!item) return
-    document.title = `${item.title} — Pedro Coelho`
+    const prevTitle = document.title
+    const restore: Array<() => void> = []
+
+    if (item) {
+      const title = `${item.title} — Pedro Coelho`
+      document.title = title
+      const pairs: Array<[string, string]> = [
+        ['meta[name="description"]', item.tagline],
+        ['meta[property="og:title"]', title],
+        ['meta[property="og:description"]', item.tagline],
+        ['meta[name="twitter:title"]', title],
+        ['meta[name="twitter:description"]', item.tagline],
+      ]
+      for (const [selector, content] of pairs) {
+        const el = document.head.querySelector<HTMLMetaElement>(selector)
+        if (!el) continue
+        const prev = el.content
+        el.content = content
+        restore.push(() => { el.content = prev })
+      }
+    } else {
+      document.title = 'Not found — Pedro Coelho'
+    }
+
     return () => {
-      document.title = 'Pedro Coelho — offsec · dev · ai'
+      document.title = prevTitle
+      restore.forEach((fn) => fn())
     }
   }, [item])
 
   if (!item) {
     return (
-      <section className="detail-band" aria-label="Detail">
+      <section className="detail-band" aria-label="Not found">
         <div className="page-shell">
-          <p className="detail-p">Entry not found.</p>
+          <div className="detail-article detail-notfound" data-tone="neutral">
+            <span className="detail-eyebrow">
+              <span aria-hidden="true" className="detail-eyebrow-rule" />
+              404
+            </span>
+            <h2 className="detail-title">not found</h2>
+            <p className="detail-tagline">
+              That entry doesn’t exist — it may have been renamed or moved. Head back
+              to the works grid to keep exploring.
+            </p>
+            <Link className="detail-back" to="/">
+              <span aria-hidden="true" className="detail-back-arrow">←</span>
+              <span aria-hidden="true" className="detail-back-rule" />
+              back to works
+            </Link>
+          </div>
         </div>
       </section>
     )
@@ -121,16 +206,20 @@ function DetailSection() {
   return (
     <section className="detail-band" aria-label={`${item.title} detail`}>
       <div className="page-shell">
-        <article className="detail-article" data-tone={item.tone ?? 'neutral'}>
+        <article
+          className="detail-article"
+          data-tone={item.tone ?? 'neutral'}
+          lang={item.lang === 'pt-br' ? 'pt-BR' : undefined}
+        >
           <header className="detail-header">
             <span className="detail-eyebrow">
               <span aria-hidden="true" className="detail-eyebrow-rule" />
               {item.eyebrow}
             </span>
 
-            <h1 className="detail-title" ref={headingRef} tabIndex={-1}>
+            <h2 className="detail-title" ref={headingRef} tabIndex={-1}>
               {item.title}
-            </h1>
+            </h2>
             <p className="detail-tagline">{item.tagline}</p>
 
             {item.links.length > 0 ? (
@@ -172,12 +261,12 @@ function DetailSection() {
             {item.sections.map((section, si) => (
               <section key={si} className="detail-section">
                 {section.title ? (
-                  <h2 className="detail-h2">{section.title}</h2>
+                  <h3 className="detail-h2">{section.title}</h3>
                 ) : null}
                 {section.blocks.map((block, bi) => {
                   const isLead = globalBlockIndex === 0 && block.type === 'p'
                   globalBlockIndex++
-                  return renderBlock(block, base, bi, isLead)
+                  return renderBlock(block, base, bi, isLead, setLightbox)
                 })}
               </section>
             ))}
@@ -192,6 +281,37 @@ function DetailSection() {
           </footer>
         </article>
       </div>
+
+      {lightbox ? createPortal(
+        <div
+          className="detail-lightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-label={lightbox.alt || 'Image preview'}
+          onClick={() => setLightbox(null)}
+        >
+          <button
+            className="detail-lightbox-close"
+            onClick={() => setLightbox(null)}
+            type="button"
+            aria-label="Close preview"
+          >
+            ✕
+          </button>
+          <figure
+            className="detail-lightbox-figure"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img alt={lightbox.alt} src={lightbox.src} />
+            {lightbox.alt ? (
+              <figcaption className="detail-lightbox-caption">
+                {lightbox.alt}
+              </figcaption>
+            ) : null}
+          </figure>
+        </div>,
+        document.body,
+      ) : null}
     </section>
   )
 }

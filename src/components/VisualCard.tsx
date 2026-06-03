@@ -5,7 +5,6 @@ type VisualCardProps = {
   avatar?: string
   description?: string
   eyebrow?: string
-  index?: number
   lang?: 'pt-br'
   meta?: string[]
   title: string
@@ -21,7 +20,7 @@ function VisualCard({ activeSlug, avatar, description, eyebrow, lang, meta, titl
   return (
     <Link
       aria-current={isActive ? 'true' : undefined}
-      className={`specimen-card specimen-card--link${isActive ? ' is-active' : ''}`}
+      className={`specimen-card specimen-card--link reveal${isActive ? ' is-active' : ''}`}
       data-tone={tone ?? 'neutral'}
       to={target}
     >
