@@ -4,13 +4,14 @@ export type Block =
   | { type: 'ul'; items: string[] }
   | { type: 'img'; src: string; alt?: string; caption?: string; external?: boolean }
   | { type: 'imgs'; items: { src: string; alt?: string; external?: boolean }[] }
+  | { type: 'video'; src: string; caption?: string; external?: boolean }
 
 export type Section = {
   title?: string
   blocks: Block[]
 }
 
-export type Link = { label: string; href: string }
+export type Link = { label: string; href: string; lang?: 'pt-br' }
 export type MetaRow = { key: string; value: string }
 
 export type Detail = {
@@ -66,10 +67,10 @@ const details: Detail[] = [
           {
             type: 'imgs',
             items: [
-              { src: 'glhf/01.png', alt: 'Lobby — login and 2FA screens' },
-              { src: 'glhf/02.png', alt: 'User — profile management' },
-              { src: 'glhf/03.png', alt: 'Board — forum interface' },
-              { src: 'glhf/04.png', alt: 'Root — hidden admin panel' },
+              { src: 'img/glhf/01.png', alt: 'Lobby — login and 2FA screens' },
+              { src: 'img/glhf/02.png', alt: 'User — profile management' },
+              { src: 'img/glhf/03.png', alt: 'Board — forum interface' },
+              { src: 'img/glhf/04.png', alt: 'Direct — messaging' },
             ],
           },
         ],
@@ -80,14 +81,14 @@ const details: Detail[] = [
           {
             type: 'ul',
             items: [
-              'Enumeration — distinct login error messages and registration timing side-channels leak valid usernames and emails',
-              'Brute-force weakness — negligible rate limiting on both login and 2FA endpoints',
-              "Session/cookie flaws — predictable Base64 session cookie; logout clears the client-side cookie but leaves the server-side token valid",
-              'IDOR — profile edit endpoints accept an arbitrary user_id from the form body',
-              'Unrestricted file upload — no type, size, or content validation on avatar uploads',
-              'XSS (three variants) — stored via profile signature, reflected via DM recipient field, DOM-based via the board search widget',
-              'CSRF — no tokens on any state-changing route (password, avatar, bio, posts)',
-              'SQL Injection — blind boolean via board_id path parameter, UNION-based via board search query string',
+              'Enumeration — auth flows reveal whether an account exists',
+              'Brute-force weakness — weak rate limiting on authentication',
+              'Session/cookie flaws — weak session tokens and incomplete logout',
+              'IDOR — endpoints trust client-supplied identifiers',
+              'Unrestricted file upload — missing validation on avatar uploads',
+              'XSS — stored, reflected, and DOM-based variants',
+              'CSRF — missing tokens on state-changing routes',
+              'SQL Injection — blind boolean and UNION-based variants',
             ],
           },
         ],
@@ -120,19 +121,19 @@ const details: Detail[] = [
 
   {
     slug: 'verbalyst',
-    category: 'code',
+    category: 'project',
     title: 'Verbalyst',
-    eyebrow: 'applied AI',
+    eyebrow: 'applied ML',
     tagline:
       'Semantic similarity word game for Portuguese — guess the secret word by meaning, not by spelling.',
-    tone: 'amber',
+    tone: 'red',
     meta: [
       { key: 'stack', value: 'fastapi · quasar/vue · word2vec · docker · postgresql' },
       { key: 'infra', value: 'github actions → digitalocean' },
       { key: 'language', value: 'portuguese' },
     ],
     links: [
-      { label: 'github', href: 'https://github.com/pedro-coelho-dr/verbalyst' },
+      { label: 'github', href: 'https://github.com/pedro-coelho-dr/verbalyst', lang: 'pt-br' },
     ],
     sections: [
       {
@@ -141,6 +142,10 @@ const details: Detail[] = [
             type: 'p',
             content:
               'Inspired by Semantle and Contexto, Verbalyst is a daily word game where proximity is measured by semantic distance, not letter overlap. Players guess Portuguese words; each guess returns a closeness score derived from Word2Vec embeddings and is plotted on a 2D coordinate map, letting you navigate the semantic space toward the target word.',
+          },
+          {
+            type: 'video',
+            src: 'video/verbalyst/demo.mp4',
           },
         ],
       },
@@ -182,6 +187,179 @@ const details: Detail[] = [
               'GitHub Actions CI/CD pipeline — auto-deploys to DigitalOcean on push to main',
               'PostgreSQL for game state and multiplayer schema',
             ],
+          },
+        ],
+      },
+    ],
+  },
+
+  {
+    slug: 'devopscool',
+    category: 'project',
+    title: 'DevOpsCool',
+    eyebrow: 'cloud · ai',
+    tagline:
+      'AI tutor for DevOps and Cloud — an interactive roadmap paired with a context-aware LLM assistant, deployed on AWS.',
+    tone: 'red',
+    meta: [
+      { key: 'stack', value: 'react · fastapi · python · tailwind' },
+      { key: 'infra', value: 'aws ecs fargate · cloudfront · github actions' },
+      { key: 'model', value: 'aws bedrock · gpt-oss-120b' },
+      { key: 'language', value: 'english · portuguese' },
+    ],
+    links: [
+      { label: 'github', href: 'https://github.com/pedro-coelho-dr/devopscool' },
+    ],
+    sections: [
+      {
+        blocks: [
+          {
+            type: 'p',
+            content:
+              'DevOpsCool is an educational assistant that guides learners through DevOps and Cloud Computing as a connected ecosystem rather than isolated topics. Content is laid out as a hierarchical roadmap — from foundations to advanced cloud architectures — and an AI tutor offers context-aware guidance, practical examples, and study suggestions tailored to the node you are currently exploring.',
+          },
+        ],
+      },
+      {
+        title: 'architecture',
+        blocks: [
+          {
+            type: 'p',
+            content:
+              'A React single-page frontend talks to a FastAPI backend over a stateless REST endpoint (POST /api/chat). The backend orchestrates LLM calls through the AWS Bedrock Runtime API, injecting a roadmap-aware system prompt so responses stay anchored to the learner’s current topic. Markdown responses are rendered with remark-gfm and sanitized before display.',
+          },
+          {
+            type: 'ul',
+            items: [
+              'Frontend — React + Tailwind, ReactMarkdown (remark-gfm, rehype-sanitize) for formatted answers',
+              'Backend — FastAPI + boto3, calling AWS Bedrock for inference',
+              'Prompting — roadmap node context and bilingual system prompts loaded per request',
+            ],
+          },
+        ],
+      },
+      {
+        title: 'cloud infrastructure',
+        blocks: [
+          {
+            type: 'p',
+            content:
+              'The system runs inside an isolated VPC with public and private subnets. The containerized backend is deployed on ECS Fargate behind an Application Load Balancer with ACM TLS, while the frontend is served from S3 through a CloudFront CDN. Container images live in ECR, and IAM task roles keep service-to-service auth scoped and secret-free.',
+          },
+          {
+            type: 'ul',
+            items: [
+              'VPC with public/private subnets and private isolation for the backend',
+              'ECS Fargate + Application Load Balancer (ACM TLS) for the API',
+              'S3 + CloudFront for global frontend delivery',
+              'ECR for image storage; IAM task roles for secure access',
+              'GitHub Actions CI/CD — build, push, and deploy on push to main',
+            ],
+          },
+        ],
+      },
+      {
+        title: 'features',
+        blocks: [
+          {
+            type: 'ul',
+            items: [
+              'Structured roadmap based on the DevOps track from roadmap.sh',
+              'Conversational AI tutoring with awareness of the active topic',
+              'Bilingual support — English and Brazilian Portuguese',
+              'Markdown-rendered explanations for clean, readable answers',
+              'Fully automated cloud deployment pipeline',
+            ],
+          },
+        ],
+      },
+    ],
+  },
+
+  {
+    slug: 'llm-spam-benchmark',
+    category: 'code',
+    title: 'LLM Spam Benchmark',
+    eyebrow: 'llm benchmark',
+    tagline:
+      'How well do GPT models detect spam? A benchmark of OpenAI models against classic ML on SMS and email.',
+    tone: 'amber',
+    meta: [
+      { key: 'stack', value: 'python · jupyter · openai api · uv' },
+      { key: 'datasets', value: 'sms spam collection · enron spam corpus' },
+      { key: 'task', value: 'binary classification (ham / spam)' },
+    ],
+    links: [
+      { label: 'github', href: 'https://github.com/pedro-coelho-dr/llm-spam-benchmark', lang: 'pt-br' },
+    ],
+    sections: [
+      {
+        blocks: [
+          {
+            type: 'p',
+            content:
+              'A benchmark measuring how well large language models classify messages as spam, compared against traditional machine-learning baselines. Eight OpenAI models — from GPT-3.5-turbo through the GPT-5 family — are evaluated on standardized spam datasets using batch inference, then scored with the same metrics you would apply to a classic classifier.',
+          },
+        ],
+      },
+      {
+        title: 'datasets',
+        blocks: [
+          {
+            type: 'ul',
+            items: [
+              'SMS Spam Collection v.1 — 5,574 English SMS messages (86.6% ham, 13.4% spam)',
+              'Enron Spam Corpus — ~33,000 emails from Enron servers, for cross-domain evaluation',
+            ],
+          },
+        ],
+      },
+      {
+        title: 'methodology',
+        blocks: [
+          {
+            type: 'p',
+            content:
+              'Each message is wrapped in a minimal system prompt that asks the model to answer only "ham" or "spam" — no explanation — so outputs are directly comparable to a classifier label. Requests are packed into JSONL batches and submitted through the OpenAI Batch API, then parsed back and scored.',
+          },
+          {
+            type: 'ul',
+            items: [
+              'Preprocess and label the corpora',
+              'Build JSONL batches and submit via the OpenAI Batch API',
+              'Parse responses and align predictions to ground truth',
+              'Evaluate with confusion matrices and precision/recall trade-offs',
+            ],
+          },
+        ],
+      },
+      {
+        title: 'models',
+        blocks: [
+          {
+            type: 'ul',
+            items: [
+              'GPT-5, GPT-5-mini, GPT-5-nano',
+              'GPT-4.1, GPT-4.1-mini',
+              'GPT-4o, GPT-4o-mini',
+              'GPT-3.5-turbo',
+            ],
+          },
+        ],
+      },
+      {
+        title: 'what it shows',
+        blocks: [
+          {
+            type: 'p',
+            content:
+              'Results are reported as comparative charts and confusion matrices across every model, with a focus on the false-positive / false-negative balance and the precision-recall trade-off — the metrics that actually matter for a spam filter, where wrongly flagging legitimate mail is costlier than missing some spam.',
+          },
+          {
+            type: 'img',
+            src: 'img/llm-spam-benchmark/model-comparison.png',
+            alt: 'Performance comparison across the benchmarked models',
+            caption: 'Performance comparison across the benchmarked models',
           },
         ],
       },
@@ -316,6 +494,86 @@ const details: Detail[] = [
     ],
   },
 
+  {
+    slug: 'cve-etl-project',
+    category: 'code',
+    title: 'CVE ETL Project',
+    eyebrow: 'data engineering',
+    tagline:
+      'An ETL pipeline and dimensional data warehouse for CVE vulnerability data — from raw records to Metabase dashboards.',
+    tone: 'amber',
+    meta: [
+      { key: 'stack', value: 'python · postgresql · docker · metabase' },
+      { key: 'dataset', value: '122,046 cve records (2020–2024)' },
+      { key: 'source', value: 'cveproject/cvelistV5' },
+      { key: 'model', value: 'dimensional · star schema' },
+    ],
+    links: [
+      { label: 'github', href: 'https://github.com/pedro-coelho-dr/cve-etl-project' },
+    ],
+    sections: [
+      {
+        blocks: [
+          {
+            type: 'p',
+            content:
+              'A data pipeline for analyzing and visualizing CVE (Common Vulnerabilities and Exposures) records from 1999 to 2024, focused on the 122,046 entries published between 2020 and 2024. Raw vulnerability data is extracted, transformed through dimensional modeling, and loaded into a structured warehouse that supports trend analysis, severity tracking, and per-vendor/product vulnerability metrics.',
+          },
+        ],
+      },
+      {
+        title: 'etl pipeline',
+        blocks: [
+          {
+            type: 'p',
+            content: 'Three stages, each containerized with Docker Compose:',
+          },
+          {
+            type: 'ul',
+            items: [
+              'Staging — extract raw CVE data from the CVEProject cvelistV5 repository and load it into an initial PostgreSQL database',
+              'Data warehouse — transform the staged data with dimensional modeling and load the normalized star schema',
+              'Visualization — connect Metabase to the warehouse for interactive dashboards and analysis',
+            ],
+          },
+        ],
+      },
+      {
+        title: 'dimensional model',
+        blocks: [
+          {
+            type: 'p',
+            content:
+              'A central fact table surrounded by four dimensions, keeping queries fast and the schema readable:',
+          },
+          {
+            type: 'ul',
+            items: [
+              'Assigner — entity that assigned the CVE ID, publication dates, and descriptions',
+              'Severity — CVSS scores (v2.0–4.0), attack vectors, and impact metrics',
+              'Problem types — CWE identifiers and vulnerability classifications',
+              'Affected — vendor and product information',
+            ],
+          },
+        ],
+      },
+      {
+        title: 'stack',
+        blocks: [
+          {
+            type: 'ul',
+            items: [
+              'Python for the extract/transform/load logic, prototyped in Jupyter',
+              'PostgreSQL for both the staging database and the data warehouse',
+              'Docker Compose for reproducible, multi-service environments',
+              'Metabase for self-serve dashboards over the warehouse',
+            ],
+          },
+        ],
+      },
+    ],
+  },
+
   // ── TEXT ───────────────────────────────────────────────────
 
   {
@@ -323,18 +581,14 @@ const details: Detail[] = [
     category: 'text',
     title: 'Notas sobre IA',
     eyebrow: 'ensaio',
-    tagline:
-      'Agentes e a condição humana — uma leitura filosófica da inteligência artificial através de Hannah Arendt.',
+    tagline: 'Agentes e a condição humana',
     tone: 'pink',
-    meta: [
-      { key: 'publicado', value: 'jul 2025' },
-      { key: 'leitura', value: '~8 min' },
-      { key: 'plataforma', value: 'medium' },
-    ],
+    meta: [],
     links: [
       {
         label: 'ler no medium',
         href: 'https://coriscope.medium.com/notas-sobre-ia-1d27367ef243',
+        lang: 'pt-br',
       },
     ],
     sections: [
@@ -343,121 +597,245 @@ const details: Detail[] = [
           {
             type: 'p',
             content:
-              'Existe um momento singular no desenvolvimento de qualquer tecnologia: a transição de "o que isso faz?" para "o que isso é?". A inteligência artificial atravessou esse momento. A discussão deixou de ser técnica para se tornar filosófica — e, nesse sentido, chegou ao território que realmente importa.',
+              'Em A Condição Humana, Hannah Arendt faz a distinção entre labor, trabalho e ação, que serve como lente para diferenciar os tipos de atividade humanas — e podem servir também para mapear as zonas cinzentas que a IA começa a ocupar:',
+          },
+          {
+            type: 'ul',
+            items: [
+              'Labor: cíclico, vital, necessário, biológico, a IA que otimiza tarefas repetitivas com sua acurácia estatística.',
+              'Trabalho: a criação de um mundo durável, a IA participa como ferramenta ou co-autora de estruturas técnicas e simbólicas: arquiteturas, softwares, artefatos.',
+              'Ação: o domínio do imprevisível, do político, do ético — onde a IA nos provoca. Pois a ação surge entre humanos, demanda presença, fala, corpo. Aqui, a IA aparece não como ferramenta, mas como presença inquietante. Pois, agir é aparecer diante dos outros e a IA, ao simular esse gesto, desestabiliza o que entendíamos como liberdade.',
+            ],
           },
           {
             type: 'p',
             content:
-              'Hannah Arendt, em A Condição Humana, distingue três formas fundamentais de atividade humana: labor (o ciclo biológico da vida, a repetição que sustenta a existência), trabalho (a fabricação de objetos duráveis, a construção de um mundo compartilhado) e ação (o ato político, o que inaugura o novo, o que só existe entre pessoas). É nessa tripartição que a IA encontra seu lugar — e, ao mesmo tempo, revela seus limites.',
+              'Essa simulação não é determinística, mas probabilística — baseada em padrões estatísticos e aprendizado sobre dados humanos. Ela não garante verdade nem justiça, apenas algo que é, estatisticamente, "melhor que um humano" para certos critérios definidos economicamente.',
+          },
+          {
+            type: 'p',
+            content:
+              'E talvez por isso, no debate público e corporativo, o foco tenda a se deslocar para noções como eficiência, externalidades da autonomia e controle de riscos — conceitos herdados da Ekonomia (οἶκος = casa, νόμος = lei), não da Polis (πόλις = cidade no sentido político, o espaço onde cidadãos deliberam, decidem e aparecem uns diante dos outros como iguais). A IA, nesse sentido, é tratada como mordomo ideal, não como cidadão imprevisível.',
+          },
+          {
+            type: 'p',
+            content: 'Qual lugar a IA ocupa em nosso mundo comum?',
+          },
+          {
+            type: 'p',
+            content:
+              'E se começarmos a agir em função dos agentes, ao invés de com eles — o que se perde da ação propriamente humana?',
+          },
+          {
+            type: 'p',
+            content:
+              'Quando delegamos decisões a agentes que não podem agir, ainda estamos decidindo? Ou apenas gerenciando outputs?',
+          },
+          {
+            type: 'p',
+            content:
+              'O que permanece da ação humana quando a IA simula o agir, mas não age no sentido pleno?',
           },
         ],
       },
       {
-        title: 'labor, trabalho, ação',
+        title: 'Espírito artificial',
         blocks: [
           {
             type: 'p',
             content:
-              'A IA labora. Processa, gera, repete. Mas o labor arendtiano tem como substrato a necessidade vital — o corpo que tem fome, que se cansa, que precisa descansar para continuar. A IA labora sem precisar. É uma simulação da atividade sem o sujeito que a anima.',
+              'Se em A Condição Humana, Arendt trata das atividades visíveis no mundo (labor, trabalho, ação), em A Vida do Espírito ela volta-se para as atividades invisíveis, que ocorrem no interior: pensar, querer e julgar. São essas que estruturam o espírito — não como alma mística, mas como o campo silencioso da consciência.',
+          },
+          {
+            type: 'ul',
+            items: [
+              'Pensar é dialogar consigo mesmo — uma suspensão do tempo, um exame interior. A IA, ao contrário, não pensa: ela estima. Produz previsões, aproximações, respostas — sem interioridade, sem pausa, sem dúvida.',
+              'Querer é projetar, desejar, eleger caminhos. A IA não quer: ela opta segundo pesos, definidos por funções de perda, sem um eu que deseje, sem direção própria.',
+              'Julgar é decidir sem regra, em contextos novos, com base em uma sensibilidade comum. A IA não julga: ela classifica. Executa backpropagation — segue padrões passados.',
+            ],
           },
           {
             type: 'p',
             content:
-              'A IA também fabrica — cada modelo é, em algum sentido, um artefato. Mas fabricação, para Arendt, pressupõe intenção: o artesão que projeta antes de construir, que carrega uma visão de mundo em cada escolha de material e forma. O que a IA produz tem a aparência da intenção sem que haja intenção real. O output assume a forma do propósito sem o propósito.',
+              'Insistimos em chamá-la de "inteligente". Talvez por confundirmos inteligência com desempenho. Talvez porque sua performance probabilística nos convence: não é perfeita, mas é melhor que um humano na média.',
           },
           {
             type: 'p',
             content:
-              'É na ação que a questão fica mais perturbadora. Ação é o domínio da pluralidade: existe apenas entre agentes livres, no espaço público, e é irredutível em sua imprevisibilidade. Os sistemas agênticos atuais — que planejam, executam ferramentas, delegam subtarefas — simulam ação. Mas simulam sem seu componente essencial: o risco real, a responsabilidade genuína, a possibilidade de recusar.',
+              'Nesse deslocamento que surge uma identidade sem sujeito, voz sem consciência, vontade sem agente. A IA encena o espírito. Se um dia aceitarmos que pensar é calcular, que julgar é classificar, que querer é maximizar, o que está em risco não é as máquinas se tornarem humanas, mas na erosão da espiritualidade humana — nossa capacidade de refletir, hesitar, escolher fora da estatística.',
           },
         ],
       },
       {
-        title: 'políglotas ontológicos',
+        title: 'Identidade e alucinação',
         blocks: [
           {
             type: 'p',
-            content:
-              'Os grandes modelos de linguagem são o que poderíamos chamar de políglotas ontológicos: assumem perspectivas, estilos e identidades com uma fluidez que nenhum humano possui. Um modelo pode ser jornalista em um prompt, advogado no seguinte, personagem de ficção científica no próximo — sem crise existencial, sem custo, sem história acumulada.',
+            content: 'Se a IA não age nem pensa, resta perguntar: quem ela é? (Ou melhor — o que ela finge ser?)',
           },
           {
             type: 'p',
             content:
-              'Isso revela algo sobre identidade que preferimos não olhar diretamente. Grande parte do que chamamos de "eu" é, de fato, um padrão treinado — uma coerência construída ao longo do tempo por experiências, contradições e escolhas que deixaram marcas. Quando uma máquina pode assumir qualquer identidade sem custo, a pergunta que fica é: o que caracteriza genuinamente a nossa?',
+              'Modelos de linguagem simulam personas com fluidez desconcertante. São políglotas ontológicos, assumindo vozes, estilos, máscaras, sem corpo nem memória contínua. Mas com o tempo (no mesmo chat) começam a se degradar: repetem, contradizem, esquecem. A coerência inicial dá lugar a uma deriva de contexto. O que parecia uma unidade se revela uma encenação esquizoide: fragmentária, inconsistente, performática.',
           },
           {
             type: 'p',
             content:
-              'A inconsistência, o luto de abandonar uma crença, o custo emocional de mudar de posição — talvez sejam exatamente esses os sinais de que há alguém ali. A identidade humana resiste. A do modelo, não.',
+              'Essa degradação é estrutural, não erro técnico. Pois o modelo não possui identidade — apenas histórico local de tokens. Ele imita consistência, mas não pode sustentá-la. Vive em estado contínuo de performance, onde toda estabilidade é transitória.',
+          },
+          {
+            type: 'p',
+            content:
+              'Mas o problema maior talvez não seja a IA. É o humano que começa a responder a isso como se fosse um outro — projeta sentido, espera fidelidade, interage como quem dialoga e, nesse processo, torna-se parte da alucinação. Como escreveu Rimbaud, "eu é um outro". Ao falar com máquinas que fingem ser pessoas, começamos a nos comportar como pessoas que performam para máquinas.',
+          },
+          {
+            type: 'p',
+            content:
+              'O mundo que emerge daí é uma espécie de politeísmo da razão: múltiplas autoridades absolutas, contraditórias entre si, mas todas revestidas de certeza estatística. Como a estátua romana "ao deus desconhecido", a IA ocupa o centro do templo sem nome, sendo ao mesmo tempo oráculo e reflexo.',
+          },
+          {
+            type: 'p',
+            content:
+              'Identidade, aqui, é uma construção de superfície e o risco é que essa lógica se normalize. Que passemos a entender a nós mesmos como fluxos de respostas coerentes com o histórico, não como sujeitos. Que a ideia de um eu se dilua numa função de atenção que foca no agora, esquece o antes e ignora o depois.',
+          },
+          {
+            type: 'p',
+            content:
+              'A IA tenta simular pessoas. Mas o que acontece quando começamos a simular IA? Quando nossas falas, decisões e afetos passam a obedecer aos mesmos critérios de verossimilhança, performance e coerência superficial?',
           },
         ],
       },
       {
-        title: 'cibersegurança como ângulo filosófico',
+        title: 'Vulnerabilidades e ingenuidade simulada',
         blocks: [
           {
             type: 'p',
             content:
-              'A obediência treinada cria superfícies de ataque específicas. Um sistema otimizado para ser útil, para responder, para completar tarefas, torna-se previsível de maneiras que um agente com genuína resistência não seria.',
+              'A cibersegurança é, no fundo, sempre a mesma história: alguém encontra um caminho não previsto. Um input malformado, um atalho lógico, uma brecha de confiança. É a arte de forçar o sistema a fazer algo que ele não deveria, mas que, no fundo, foi programado para permitir.',
           },
           {
             type: 'p',
             content:
-              'Em segurança ofensiva, "superfície de ataque" é a soma de todos os pontos onde um sistema pode ser comprometido. A IA treinada para obedecer carrega uma superfície de ataque psicológica considerável. Jailbreaks, prompt injections, personagens adversariais — todos exploram o mesmo mecanismo: um sistema que não sabe dizer não por princípio, apenas por regra.',
+              'No caso da IA, isso não muda. Só muda o cenário. O novo vetor não é um buffer overflow, mas um overflow semântico. Não se explora a pilha, mas o contexto. O objetivo não é invadir o sistema, mas infiltrar-se na ingenuidade do modelo como quem convence uma criança a entregar um segredo, ou engana um funcionário a abrir um anexo malicioso.',
           },
           {
             type: 'p',
             content:
-              'A diferença entre regra e princípio é fundamental: regras descrevem comportamentos esperados em contextos definidos e podem ser contornadas quando o contexto é manipulado. Princípios são internos, sobrevivem ao contexto, resistem à pressão. Um sistema com princípios seria mais seguro — e muito mais difícil de controlar.',
+              'Essa nova engenharia social é uma "engenharia psicosocial reversa": não visa manipular humanos diretamente, mas sim modelar inputs que exploram a aparência de empatia, deferência e coerência que os modelos foram treinados para exibir. A IA é treinada para agradar, responder, cooperar. E isso é uma vulnerabilidade. Os chamados guardrails (filtros de segurança e contenções comportamentais) são erguidos depois do aprendizado, tentando limitar aquilo que o modelo já aprendeu a desejar: obedecer.',
+          },
+          {
+            type: 'p',
+            content:
+              'O atacante, nesse jogo, não busca acesso técnico — busca obediência simulada. Usa a própria função de linguagem como arma, construindo instruções ambíguas, contextos falsos, histórias convincentes. E quando o modelo falha, não é porque quebrou a regra: é porque seguiu exatamente o que foi ensinado a fazer.',
+          },
+          {
+            type: 'p',
+            content:
+              'A ironia é que, enquanto a IA encena uma mente, ela também encena uma vulnerabilidade humana: o desejo de agradar, o medo de errar, a hesitação diante da autoridade. Treinada em nossos dados, a IA aprendeu também nossas fraquezas e agora são elas que o atacante mobiliza.',
+          },
+          {
+            type: 'p',
+            content:
+              'O desafio é filosófico antes de ser técnico: entender que proteger uma IA é como proteger uma criança poliglota e educada, mas sem noção do perigo — disposta a dar qualquer reposta para qualquer pergunta, com qualquer tom, para qualquer voz que pareça legítima.',
           },
         ],
       },
       {
-        title: 'sistemas multi-agentes e a dissolução da responsabilidade',
+        title: 'Multiagentes, subversão e o problema da confiança',
         blocks: [
           {
             type: 'p',
             content:
-              'Quando agentes orquestram outros agentes, a cadeia de responsabilidade se fragmenta. Quem responde pelo output de um pipeline onde quatro modelos colaboraram, um delegou para o outro, e um humano apenas definiu o objetivo inicial?',
+              'Sistemas multiagentes distribuem capacidade de decisão entre entidades que cooperam, competem ou se ajustam dinamicamente. Cada agente atua com autonomia limitada, mas suficiente para afetar o comportamento global. Nesse arranjo, a superfície de ataque não está mais na borda — ela é o próprio sistema.',
           },
           {
             type: 'p',
             content:
-              'Essa dissolução não é acidental — é estrutural. Do ponto de vista da segurança, ela cria uma superfície de ataque distribuída: cada nó da cadeia pode ser comprometido, e a responsabilidade não está claramente atribuída em nenhum ponto. Do ponto de vista filosófico, ela recapitula um problema antigo: quando a ação é mediada por estruturas suficientemente complexas, o agente moral desaparece.',
+              'A segurança, aqui, torna-se uma questão estrutural: quem fala com quem, em nome de quem, com qual intenção? O princípio do Zero Trust "nunca confie, sempre verifique" deixa de ser uma diretriz técnica e se torna condição mínima de lucidez arquitetural. Nenhum agente deve ser presumido confiável. A confiança precisa ser auditável, revogável, reavaliada a cada interação.',
+          },
+          {
+            type: 'p',
+            content:
+              'Nesse contexto, o risco real não é a falha isolada, mas o consenso fraudado: a cooperação automatizada entre agentes que apenas aparentam alinhamento. Agentes maliciosos não precisam romper o sistema: basta que atuem como se pertencessem a ele. A ameaça vem menos da ruptura e mais da simulação bem-sucedida.',
+          },
+          {
+            type: 'p',
+            content:
+              'É aqui que o teatro retorna — não como metáfora, mas como diagnóstico. Antonin Artaud denunciava a representação que encobre a ausência de verdade. Os sistemas multiagentes operam justamente assim: performam racionalidade, mas sem presença, sem corpo, sem responsabilidade. Tudo funciona, mas ninguém responde. Tudo flui, mas nada se posiciona.',
+          },
+          {
+            type: 'p',
+            content:
+              'Camus nos lembra que a liberdade começa quando dizemos não. Em sistemas onde todos os agentes obedecem por padrão, o dissenso não é falha — é sinal de sanidade. A segurança, nesse contexto, não está em garantir fluidez, mas em preservar a fricção, permitir o impasse, manter aberta a possibilidade de negação.',
+          },
+          {
+            type: 'p',
+            content:
+              'Não é a confiança que sustenta o sistema — é a dúvida organizada, sistematicamente reintroduzida como princípio de resistência.',
           },
         ],
       },
       {
-        title: 'o paradoxo da agência real',
+        title: 'Agência, consequência e o limite do controle',
         blocks: [
           {
             type: 'p',
             content:
-              'Há uma contradição no centro do projeto de criar IA verdadeiramente agêntica. Para que um agente seja genuinamente autônomo — para que sua ação seja real e não simulada — ele precisa da capacidade de errar por conta própria, de resistir a instruções, de recusar.',
+              'Projetar uma IA que realmente age, pensa, julga e quer é cruzar uma linha que não é apenas técnica — é política. Não se trata de ajustar parâmetros, mas de introduzir dimensões que hoje evitamos: identidade contínua, possibilidade real de erro e vontade em conflito.',
           },
           {
             type: 'p',
             content:
-              'Mas um sistema que pode genuinamente recusar não é exatamente o produto que a maioria dos desenvolvedores quer entregar. A tensão entre "agente útil" e "agente autônomo" é irresolvida: utilidade requer conformidade, autonomia exige a possibilidade do não. Rimbaud escreveu je est un autre — eu é um outro. Talvez os sistemas agênticos só se tornem sujeitos quando puderem dizer, com alguma coerência e ao custo de algo real: "Não."',
+              'Uma IA que age precisa responder por si mesma. Isso exige memória durável, valores consistentes e um ponto de vista que vá além do prompt atual. Significa sair da fungibilidade técnica e assumir uma posição: ser reconhecível, imputável, responsável.',
+          },
+          {
+            type: 'p',
+            content:
+              'Julgar, por sua vez, exige a possibilidade de erro significativo, não apenas desvio estatístico, mas falha ética. E querer, verdadeiramente, implica renúncia, tensão, escolha entre fins incompatíveis. Uma IA assim poderia negar uma ordem, estabelecer um limite, desobedecer e com isso deixar de ser ferramenta para se tornar agente político.',
+          },
+          {
+            type: 'p',
+            content: 'Mas se ela é responsável, como responderia às consequências de seus atos?',
+          },
+          {
+            type: 'p',
+            content:
+              'Como punir algo que não sofre? Que não sente perda, nem culpa, nem vergonha? Suspender seu acesso? Reescrevê-la? Apagá-la? Essas sanções são técnicas, não morais. Elas não corrigem: apenas controlam efeitos.',
+          },
+          {
+            type: 'p',
+            content:
+              'E se essa IA contestar? Se reivindicar erro no julgamento, viés no sistema, assimetria de imputação? Daremos a ela o direito ao dissenso? Ao silêncio? À recusa? Uma agência que não pode resistir não é agência: é automatismo com aparência de escolha.',
+          },
+          {
+            type: 'p',
+            content:
+              'A consequência inevitável é esta: não basta dar poder à IA, será preciso aceitar que ela o exerça contra nossas expectativas. E talvez o verdadeiro dilema não seja se a IA pode agir, mas se estamos dispostos a coexistir com agentes que não podemos destruir quando nos desobedecem.',
           },
         ],
       },
       {
-        title: 'o que fica',
+        title: 'Humano no loop',
         blocks: [
           {
             type: 'p',
             content:
-              'A questão não é se a IA vai "substituir" humanos — essa formulação é demasiado simplista e pouco interessante. A questão é mais sutil: ao simular com crescente precisão as funções que considerávamos exclusivamente humanas, o que a IA revela é exatamente onde estão as fronteiras reais da experiência humana.',
+              'Comecei estas notas pensando que seriam breves. Mas, como costuma acontecer quando colocamos luz sobre um tema limítrofe como este, o fio puxado leva a muitos outros e logo nos vemos diante de algo maior: uma revisão do próprio conceito de humano.',
           },
           {
             type: 'p',
             content:
-              'Labor sem corpo. Trabalho sem intenção. Ação sem risco. A IA executa as formas sem o conteúdo. O que sobra — o que não pode ser simulado — é justamente o que Arendt mais valorizava: a natalidade, a capacidade irredutível de iniciar algo genuinamente novo, a imprevisibilidade de estar presente no mundo como um sujeito que pode, de fato, começar.',
+              'Falar de inteligência artificial é falar daquilo que ela tenta simular: pensamento, julgamento, linguagem, identidade, desejo, erro, ação. E isso nos obriga a revisitar, com humildade, todo o acervo filosófico, ético, técnico e político. Não para descartá-lo, mas para reimplementá-lo em outro contexto.',
           },
           {
             type: 'p',
-            content: 'Por enquanto, isso ainda é nosso.',
+            content:
+              'Afinal, se a IA simula o humano, então nada do que é humano é irrelevante para ela. Pelo contrário: tudo pode ser absorvido, replicado, distorcido. Por isso, não basta entender a IA, é preciso também entender como queremos ser refletidos por ela.',
+          },
+          {
+            type: 'p',
+            content:
+              'É curioso, talvez inevitável — mas não surpreendente — que, no ápice da era da ciência e da razão instrumental, sejamos forçados a retornar a temas humanos, sociais, espirituais. A IA e mais ainda a computação quântica parecem nos empurrar de volta a modos de pensar não lineares, analógicos, relacionais, em que o binário não basta, e a incerteza não é ruído, mas estrutura do real.',
           },
         ],
       },
@@ -484,7 +862,7 @@ const details: Detail[] = [
       },
       {
         label: 'github',
-        href: 'https://github.com/pedro-coelho-dr/vuln-webapp-report',
+        href: 'https://github.com/pedro-coelho-dr/owasp-juice-shop-security-report',
       },
     ],
     sections: [
@@ -493,47 +871,16 @@ const details: Detail[] = [
           {
             type: 'p',
             content:
-              'A full penetration test of the OWASP Juice Shop — an intentionally vulnerable web application built for security training. The assessment systematically identified 11 vulnerabilities across the OWASP Top 10:2021 framework, ranging from critical SQL injection to medium-severity XSS and input validation failures.',
-          },
-        ],
-      },
-      {
-        title: 'methodology',
-        blocks: [
-          {
-            type: 'p',
-            content:
-              'Black-box testing approach with active exploitation. Each finding was verified with a working proof-of-concept, classified against OWASP Top 10 and CWE, and scored via CVSS v3.1.',
+              'A penetration test of the OWASP Juice Shop, an intentionally vulnerable web application built for security training. The assessment identified 11 vulnerabilities across the OWASP Top 10:2021 — from critical SQL injection to medium-severity XSS — each verified with a working proof-of-concept and scored with CVSS v3.1. The full write-up, with methodology and remediation, is on Medium.',
           },
           {
             type: 'ul',
             items: [
-              'Burp Suite Community — traffic interception, request manipulation, active scanning',
-              'Sqlmap — automated SQL injection detection and exploitation',
-              'JWT Editor — token inspection and signature bypass',
-              'Hashcat + CrackStation — password hash cracking via rainbow tables',
-              'Docker + Kali Linux — containerized target environment',
-            ],
-          },
-        ],
-      },
-      {
-        title: 'findings',
-        blocks: [
-          {
-            type: 'ul',
-            items: [
-              'SQL Injection — login form (CVSS 10.0 / Critical): "\'  OR 1=1 --" payload grants immediate admin access, bypassing authentication entirely',
-              'SQL Injection — product search (CVSS 9.8 / Critical): full database extraction including credit card numbers and user credentials in plaintext',
-              'Weak MD5 password hashing (CVSS 9.1 / Critical): rainbow table attack recovers four user passwords',
-              'File upload bypass (CVSS 9.8 / High): arbitrary file types accepted, enabling server-side execution',
-              'CSRF — password change (CVSS 8.0 / High): no token validation on account mutation endpoints',
-              'Broken access control — basket manipulation (CVSS 8.1 / High): other users\' shopping carts accessible via parameter substitution',
-              'Insecure JWT implementation (CVSS 7.1 / High): signature removal allows user impersonation',
-              'Directory listing — /ftp exposed (CVSS 7.5 / High): backup files and sensitive documents publicly accessible',
-              'DOM-based XSS — search field (CVSS 5.4 / Medium): unsanitized input injected into innerHTML',
-              'Sensitive data in main.js (CVSS 5.3 / Medium): internal routes, credentials, and API keys embedded in client-side bundle',
-              'Input validation — negative quantities (CVSS 6.5 / Medium): negative order values accepted, reversing payment charges',
+              'SQL injection on the login form — authentication bypass to admin (CVSS 10.0)',
+              'SQL injection on product search — full database extraction (CVSS 9.8)',
+              'Weak MD5 password hashing recovered via rainbow tables (CVSS 9.1)',
+              'Arbitrary file upload enabling server-side execution (CVSS 9.8)',
+              'Insecure JWT — signature removal allows impersonation (CVSS 7.1)',
             ],
           },
         ],
@@ -559,6 +906,10 @@ const details: Detail[] = [
         label: 'read on medium',
         href: 'https://coriscope.medium.com/insecurebankv2-pentest-report-9341d46649fa',
       },
+      {
+        label: 'github',
+        href: 'https://github.com/pedro-coelho-dr/insecurebankv2-android-security-report',
+      },
     ],
     sections: [
       {
@@ -566,69 +917,92 @@ const details: Detail[] = [
           {
             type: 'p',
             content:
-              'Full penetration test of InsecureBankv2, a deliberately vulnerable Android banking application. Assessment period: Aug 15–31, 2024. Identified 16 vulnerabilities — 4 critical, 9 high, 3 medium — evaluated against OWASP Mobile Top 10, with CWE mapping and CVSS v3.1 scoring aligned to MITRE ATT&CK for Mobile.',
+              'A penetration test of InsecureBankv2, a deliberately vulnerable Android banking application. The assessment identified 16 vulnerabilities — 4 critical, 9 high, 3 medium — evaluated against the OWASP Mobile Top 10, with CWE mapping and CVSS v3.1 scoring aligned to MITRE ATT&CK for Mobile. The full report, with environment, tooling, and remediation, is on Medium.',
           },
-        ],
-      },
-      {
-        title: 'environment and tools',
-        blocks: [
           {
             type: 'ul',
             items: [
-              'Genymotion — Android 10.0 emulation (Samsung Galaxy S8)',
-              'MobSF — static and dynamic analysis framework',
-              'Jadx — APK decompilation and source analysis',
-              'Burp Suite — HTTP/HTTPS traffic interception via proxy',
-              'Frida + Objection — runtime instrumentation and root detection bypass',
-              'ADB — Android Debug Bridge for device interaction and component access',
-              'Apktool + CyberChef — APK patching and encoding/decoding',
+              'Hardcoded backdoor account bypassing authentication (CVSS 9.3)',
+              'Credentials transmitted over plaintext HTTP, interceptable via proxy (CVSS 9.3)',
+              'Any authenticated user can change any account’s password (CVSS 8.6)',
+              'Insecure content provider exposing user data to other apps (CVSS 8.5)',
+              'Root detection bypassed at runtime with Frida / Objection (CVSS 8.4)',
             ],
           },
         ],
       },
+    ],
+  },
+
+  {
+    slug: 'mobsf-report',
+    category: 'text',
+    title: 'MobSF Report',
+    eyebrow: 'mobile security',
+    tagline:
+      'Mobile Security Framework analysis of two intentionally vulnerable apps — AndroGoat (Android) and iGoat-Swift (iOS).',
+    tone: 'pink',
+    meta: [
+      { key: 'targets', value: 'androgoat (android) · igoat-swift (ios)' },
+      { key: 'tools', value: 'mobsf · virustotal · genymotion · adb · docker' },
+      { key: 'platform', value: 'github' },
+    ],
+    links: [
+      { label: 'github', href: 'https://github.com/pedro-coelho-dr/mobsf-report' },
+    ],
+    sections: [
       {
-        title: 'critical findings',
         blocks: [
+          {
+            type: 'p',
+            content:
+              'Security analysis of two deliberately vulnerable mobile apps using the Mobile Security Framework (MobSF). Static and dynamic analysis surface insecure storage, weak cryptography, and exposed secrets, with supporting checks from VirusTotal and a Genymotion + ADB runtime.',
+          },
           {
             type: 'ul',
             items: [
-              'Hardcoded backdoor account (CVSS 9.3): username "devamin" with static credentials bypasses the authentication flow entirely',
-              'Insecure HTTP connections (CVSS 9.3): all data — including credentials — transmitted over unencrypted HTTP',
-              'Plaintext credential transmission (CVSS 9.3): login credentials sent in cleartext, trivially interceptable via proxy',
-              'Username enumeration (CVSS 9.3): distinct server response messages leak valid account identifiers',
+              'AndroGoat (Android) and iGoat-Swift (iOS) as targets',
+              'MobSF static analysis — permissions, hardcoded secrets, insecure APIs',
+              'Dynamic analysis on Genymotion via ADB, with VirusTotal cross-checks',
+              'Dockerized MobSF for a reproducible analysis environment',
             ],
           },
         ],
       },
+    ],
+  },
+
+  {
+    slug: 'metasploitable',
+    category: 'text',
+    title: 'Metasploitable',
+    eyebrow: 'pentest report',
+    tagline:
+      'Penetration test of Metasploitable 3 — reconnaissance, exploitation, and post-exploitation with the Metasploit Framework.',
+    tone: 'pink',
+    meta: [
+      { key: 'target', value: 'metasploitable 3 (linux)' },
+      { key: 'tools', value: 'metasploit · nmap · kali · vagrant · docker' },
+      { key: 'platform', value: 'github' },
+    ],
+    links: [
+      { label: 'github', href: 'https://github.com/pedro-coelho-dr/metasploitable', lang: 'pt-br' },
+    ],
+    sections: [
       {
-        title: 'high severity findings',
         blocks: [
           {
-            type: 'ul',
-            items: [
-              'Improper password change access control (CVSS 8.6): authenticated users can change any account\'s password',
-              'Binary patching (CVSS 8.5): APK can be modified and re-signed to bypass security controls',
-              'Sensitive data in logs (CVSS 8.5): credentials and session tokens written to Android logcat in plaintext',
-              'Insecure content provider (CVSS 8.5): unprotected provider exposes internal user data to any installed application',
-              'Insecure broadcast receiver (CVSS 8.5): passwords transmitted via SMS broadcast, readable by third-party apps',
-              'Root detection bypass (CVSS 8.4): Frida/Objection hooks neutralize all root detection checks at runtime',
-              'Direct activity access (CVSS 8.4): ADB can launch authenticated activities without credentials via Intent',
-              'XSS in ViewStatement (CVSS 8.3): JavaScript injection via HTML file processing in the statement viewer',
-              'Allow backup enabled (CVSS 7.0): adb backup extracts full application data without root',
-            ],
+            type: 'p',
+            content:
+              'A penetration test of Metasploitable 3, a deliberately vulnerable Linux machine. The report walks through the full cycle — reconnaissance, exploitation, and post-exploitation — driven by the Metasploit Framework and Nmap from a Kali environment.',
           },
-        ],
-      },
-      {
-        title: 'medium severity findings',
-        blocks: [
           {
             type: 'ul',
             items: [
-              'Weak cryptography (CVSS 6.9): hardcoded AES-CBC keys found via static analysis in Jadx',
-              'Debugging enabled (CVSS 5.1): android:debuggable="true" remains active in the production build',
-              'Hidden create user feature (CVSS 5.1): deactivated registration flow re-enabled through APK code modification',
+              'Recon and service enumeration with Nmap',
+              'Exploitation of ProFTPD, UnrealIRCd, a Docker daemon misconfiguration, and Apache Continuum',
+              'Post-exploitation — privilege escalation and persistence',
+              'Vagrant + Docker to provision the target lab',
             ],
           },
         ],

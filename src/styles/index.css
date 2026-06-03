@@ -449,24 +449,33 @@
     margin-top: 1.5rem;
   }
 
+  /* Tone-colored pill so the links read as primary actions, not footnotes. */
   .detail-link-item {
     display: inline-flex;
-    align-items: baseline;
-    gap: 0.34rem;
-    padding-bottom: 2px;
-    border-bottom: 1px solid transparent;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.85rem;
+    border: 1px solid var(--detail-badge-border);
+    border-radius: 999px;
+    background: var(--detail-badge-bg);
     font-family: var(--font-mono);
     font-size: 0.7rem;
     font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: lowercase;
-    color: rgba(168, 159, 145, 0.62);
-    transition: color 180ms ease, border-color 180ms ease;
+    color: var(--detail-badge-color);
+    transition:
+      border-color 180ms ease,
+      background-color 180ms ease,
+      box-shadow 180ms ease,
+      transform 180ms ease;
   }
 
   .detail-link-item:hover {
-    color: var(--detail-badge-color);
-    border-bottom-color: var(--detail-accent);
+    border-color: var(--detail-accent);
+    background: var(--detail-accent-faint);
+    box-shadow: 0 0 0 1px var(--detail-accent-faint), 0 8px 20px rgba(0, 0, 0, 0.28);
+    transform: translateY(-1px);
   }
 
   .detail-link-arrow {
@@ -477,6 +486,32 @@
 
   .detail-link-item:hover .detail-link-arrow {
     transform: translate(2px, -2px);
+  }
+
+  /* PT-BR marker — flags links that lead to Portuguese-language content. The
+     dot evokes the Brazilian flag (green field, yellow centre) without relying
+     on emoji, which renders inconsistently across platforms. */
+  .detail-link-flag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    padding: 0.14em 0.46em 0.14em 0.34em;
+    border: 1px solid rgba(0, 156, 59, 0.45);
+    border-radius: 999px;
+    background: rgba(0, 156, 59, 0.12);
+    font-size: 0.52rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    line-height: 1;
+    color: rgba(132, 210, 156, 0.95);
+  }
+
+  .detail-link-flag-mark {
+    width: 0.52em;
+    height: 0.52em;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 50%, #ffdf00 0 36%, #009c3b 40% 100%);
   }
 
   /* Spec strip — compact technical datasheet, hairline-ruled */
@@ -638,6 +673,23 @@
 
   .detail-image-grid .detail-image {
     margin: 0;
+  }
+
+  /* Portrait mobile capture — kept gif-sized so the low-res source isn't
+     upscaled past where it looks crisp */
+  .detail-video {
+    margin: 0.6rem 0 1rem;
+    max-width: 20rem;
+    overflow: hidden;
+    background: #0d0b09;
+  }
+
+  .detail-video video {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 70vh;
+    object-fit: contain;
   }
 
   /* Footer — back-to-top, echoing the hero "— more" rule-grows motif */
@@ -890,13 +942,29 @@
 
   .specimen-card-image {
     position: relative;
-    aspect-ratio: 4 / 3;
     border-bottom: 1px solid rgba(236, 230, 216, 0.06);
     background:
       linear-gradient(rgba(236, 230, 216, 0.012) 1px, transparent 1px),
       linear-gradient(90deg, rgba(236, 230, 216, 0.01) 1px, transparent 1px),
       var(--color-elevated);
     background-size: 20px 20px, 20px 20px, auto;
+  }
+
+  /* Padding spacer for the 4:3 ratio — same iOS Safari aspect-ratio caveat as
+     the feature stage (children here are absolutely positioned). */
+  .specimen-card-image::before {
+    content: '';
+    display: block;
+    padding-top: 75%;
+  }
+
+  .specimen-card-image img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
   }
 
   .specimen-card-image::after {
@@ -946,6 +1014,39 @@
 
   .specimen-card--link:hover .specimen-card-info {
     transform: translateY(-2px);
+  }
+
+  .specimen-card-eyebrow-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    align-self: flex-start;
+  }
+
+  /* PT-BR marker beside the eyebrow — green/yellow dot evokes the Brazilian
+     flag without relying on emoji (which renders inconsistently). */
+  .specimen-card-lang {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    padding: 0.2rem 0.5rem 0.2rem 0.4rem;
+    border: 1px solid rgba(0, 156, 59, 0.5);
+    border-radius: 999px;
+    background: rgba(0, 156, 59, 0.08);
+    font-family: var(--font-mono);
+    font-size: 0.56rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    line-height: 1;
+    color: rgba(138, 214, 162, 0.96);
+  }
+
+  .specimen-card-lang-mark {
+    width: 0.6em;
+    height: 0.6em;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 50%, #ffdf00 0 36%, #009c3b 40% 100%);
   }
 
   .specimen-card-eyebrow {
@@ -1223,7 +1324,26 @@
     width: 1.25rem;
     height: 0.88rem;
     vertical-align: -2px;
+    object-fit: cover;
     border: 1px solid rgba(8, 8, 7, 0.45);
+  }
+
+  /* Easter-egg link to Recife — visually identical to the surrounding line, so
+     it reads as plain text. Only a near-imperceptible warming on hover hints
+     that it is clickable. */
+  .footer-recife {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 320ms ease, filter 320ms ease;
+  }
+
+  .footer-recife:hover {
+    color: rgba(186, 176, 161, 0.85);
+    filter: brightness(1.06);
   }
 
   .footer-links {
@@ -1310,9 +1430,17 @@
 
   .home-feature__stage {
     position: relative;
-    aspect-ratio: 16 / 9;
     background: var(--color-elevated);
     overflow: hidden;
+  }
+
+  /* Ratio via a padding spacer instead of aspect-ratio: iOS Safari collapses an
+     aspect-ratio box whose children are all absolutely positioned, which dropped
+     the entire stage to 0 height on mobile (the slideshow vanished). */
+  .home-feature__stage::before {
+    content: '';
+    display: block;
+    padding-top: 56.25%;
   }
 
   .home-feature__stage::after {
@@ -1346,49 +1474,64 @@
     background-position: center;
     background-repeat: no-repeat;
     opacity: 0;
-    transition: opacity 1200ms cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 0;
+    backface-visibility: hidden;
+    /* Deactivation transition: hold fully opaque, then drop out instantly only
+       after the incoming frame (above, z-index 1) has finished fading in over
+       it. The outgoing frame never fades to a partial value, so the dark stage
+       never bleeds through — kills the per-cycle flash. */
+    transition: opacity 0s linear 1100ms;
+    /* Cinematic pan: the zoom is held constant (scale gives just enough overflow
+       to slide into) while the frame drifts slowly across — a tracking shot
+       rather than a Ken Burns zoom. Runs continuously on every frame
+       (alternate = eased reversal, no loop snap) and is decoupled from
+       .is-active, so the transform is never reset mid-fade. */
+    animation: pan-a 18000ms ease-in-out infinite alternate;
     will-change: transform, opacity;
   }
 
   .home-feature__frame.is-active {
     opacity: 1;
-    animation: kenburns 6500ms cubic-bezier(0.25, 0, 0.1, 1) both;
+    z-index: 1;
+    transition: opacity 1100ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .home-feature__frame:nth-child(2n).is-active {
-    animation-name: kenburns-alt;
+  .home-feature__frame:nth-child(2n) {
+    animation-name: pan-b;
   }
 
-  .home-feature__frame:nth-child(3n).is-active {
-    animation-name: kenburns-b;
+  .home-feature__frame:nth-child(3n) {
+    animation-name: pan-c;
   }
 
-  .home-feature__frame:nth-child(4n).is-active {
-    animation-name: kenburns-c;
+  .home-feature__frame:nth-child(4n) {
+    animation-name: pan-d;
   }
 
-  .home-feature.is-paused .home-feature__frame.is-active {
+  .home-feature.is-paused .home-feature__frame {
     animation-play-state: paused;
   }
 
-  @keyframes kenburns {
-    0%   { transform: scale(1) translate3d(0, 0, 0); }
-    100% { transform: scale(1.12) translate3d(-2.2%, -1.6%, 0); }
+  /* Constant scale (1.16) across each pan so there is no zoom — only a slow,
+     steady glide. ±6% translate stays within the 8% overflow headroom. */
+  @keyframes pan-a {
+    0%   { transform: scale(1.16) translate3d(-6%, -2.5%, 0); }
+    100% { transform: scale(1.16) translate3d(6%, 2.5%, 0); }
   }
 
-  @keyframes kenburns-alt {
-    0%   { transform: scale(1) translate3d(0.8%, 0.5%, 0); }
-    100% { transform: scale(1.12) translate3d(2.2%, 1.8%, 0); }
+  @keyframes pan-b {
+    0%   { transform: scale(1.16) translate3d(6%, 2%, 0); }
+    100% { transform: scale(1.16) translate3d(-6%, -2%, 0); }
   }
 
-  @keyframes kenburns-b {
-    0%   { transform: scale(1.04) translate3d(-1%, 0, 0); }
-    100% { transform: scale(1.1) translate3d(1.8%, -1.2%, 0); }
+  @keyframes pan-c {
+    0%   { transform: scale(1.16) translate3d(-5%, 3%, 0); }
+    100% { transform: scale(1.16) translate3d(5%, -3%, 0); }
   }
 
-  @keyframes kenburns-c {
-    0%   { transform: scale(1.06) translate3d(1%, -0.5%, 0); }
-    100% { transform: scale(1) translate3d(-1.4%, 1%, 0); }
+  @keyframes pan-d {
+    0%   { transform: scale(1.16) translate3d(5%, -2.5%, 0); }
+    100% { transform: scale(1.16) translate3d(-5%, 2.5%, 0); }
   }
 
   .home-feature__dots {
@@ -1455,7 +1598,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .home-feature__frame.is-active,
+    .home-feature__frame,
     .home-feature__dot-fill {
       animation: none !important;
     }
@@ -1564,8 +1707,10 @@
       grid-template-columns: 1fr;
     }
 
-    .home-feature__stage {
-      aspect-ratio: 16 / 9;
+    /* On mobile the destaque stacks with the regular cards, so match their
+       4:3 image ratio for a consistent single-column feed. */
+    .home-feature__stage::before {
+      padding-top: 75%;
     }
 
     .home-feature__info {

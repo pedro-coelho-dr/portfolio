@@ -2,11 +2,12 @@ import type { PortfolioItem } from './projects'
 
 export const code: PortfolioItem[] = [
   {
-    description: 'Semantic similarity word game for Portuguese — guess the secret word by meaning, not by spelling.',
-    eyebrow: 'applied AI',
-    meta: ['FastAPI', 'Word2Vec', 'Docker'],
-    title: 'Verbalyst',
-    to: '/code/verbalyst',
+    avatar: 'img/llm-spam-benchmark/avatar.png',
+    description: 'Benchmarks GPT models against classic ML for SMS/email spam detection.',
+    eyebrow: 'llm benchmark',
+    meta: ['Python', 'OpenAI API', 'Jupyter'],
+    title: 'LLM Spam Benchmark',
+    to: '/code/llm-spam-benchmark',
     tone: 'amber',
   },
   {
@@ -23,6 +24,14 @@ export const code: PortfolioItem[] = [
     meta: ['Go', 'CLI', 'Markdown'],
     title: 'mdout',
     to: '/code/mdout',
+    tone: 'amber',
+  },
+  {
+    description: 'ETL pipeline and data warehouse for analyzing CVE vulnerability trends, visualized in Metabase.',
+    eyebrow: 'data engineering',
+    meta: ['Python', 'PostgreSQL', 'Metabase'],
+    title: 'CVE ETL Project',
+    to: '/code/cve-etl-project',
     tone: 'amber',
   },
 ]

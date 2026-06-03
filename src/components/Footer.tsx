@@ -1,6 +1,7 @@
 import { CONTACT_EMAIL, CONTACT_PHONE, CONTACT_WHATSAPP } from '../data/contact'
 
 function Footer() {
+  const base = import.meta.env.BASE_URL
   return (
     <footer className="footer-contact">
       <div className="page-shell footer-contact-inner">
@@ -55,12 +56,24 @@ function Footer() {
           <span className="footer-bottom-line-sep">·</span>
           <span>2026</span>
           <span className="footer-bottom-line-sep">·</span>
-          <span>Recife</span>
-          <svg aria-label="Brazil" className="footer-bottom-line-flag" role="img" viewBox="0 0 20 14">
-            <rect fill="#009c3b" height="14" width="20" />
-            <polygon fill="#ffdf00" points="10,1.7 18.3,7 10,12.3 1.7,7" />
-            <circle cx="10" cy="7" fill="#002776" r="2.5" />
-          </svg>
+          <a
+            className="footer-recife"
+            href="https://en.wikipedia.org/wiki/Recife"
+            rel="noreferrer"
+            target="_blank"
+          >
+            <span>Recife</span>
+            <img
+              alt="Pernambuco"
+              className="footer-bottom-line-flag"
+              src={`${base}img/flags/pernambuco.svg`}
+            />
+            <img
+              alt="Brazil"
+              className="footer-bottom-line-flag"
+              src={`${base}img/flags/brazil.svg`}
+            />
+          </a>
         </p>
       </div>
     </footer>

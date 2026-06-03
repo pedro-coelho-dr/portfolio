@@ -7,7 +7,7 @@ function scrollToTop() {
   window.scrollTo({ top: 0, left: 0, behavior: reduce ? 'auto' : 'smooth' })
 }
 
-function renderBlock(block: Block, base: string, key: number, isLead: boolean, showImages: boolean) {
+function renderBlock(block: Block, base: string, key: number, isLead: boolean) {
   switch (block.type) {
     case 'p':
       return (
@@ -30,7 +30,6 @@ function renderBlock(block: Block, base: string, key: number, isLead: boolean, s
         </ul>
       )
     case 'img': {
-      if (!showImages) return null
       const src = block.external ? block.src : `${base}${block.src}`
       return (
         <figure key={key} className="detail-image">
@@ -41,8 +40,26 @@ function renderBlock(block: Block, base: string, key: number, isLead: boolean, s
         </figure>
       )
     }
+    case 'video': {
+      const src = block.external ? block.src : `${base}${block.src}`
+      return (
+        <figure key={key} className="detail-video">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="metadata"
+            aria-label={block.caption ?? ''}
+            src={src}
+          />
+          {block.caption ? (
+            <figcaption className="detail-caption">{block.caption}</figcaption>
+          ) : null}
+        </figure>
+      )
+    }
     case 'imgs': {
-      if (!showImages) return null
       return (
         <div key={key} className="detail-image-grid">
           {block.items.map((img, i) => {
@@ -72,7 +89,6 @@ function DetailSection() {
   const { slug } = useParams<{ slug: string }>()
   const base = import.meta.env.BASE_URL
   const item = slug ? detailMap[slug] : undefined
-  const showImages = slug === 'glhf'
 
   // Move keyboard focus to the detail heading when it opens, so screen-reader
   // and keyboard users land on the freshly revealed content.
@@ -128,6 +144,12 @@ function DetailSection() {
                     target="_blank"
                   >
                     {link.label}
+                    {link.lang === 'pt-br' ? (
+                      <span className="detail-link-flag" title="Conteúdo em português (BR)">
+                        <span aria-hidden="true" className="detail-link-flag-mark" />
+                        pt-br
+                      </span>
+                    ) : null}
                     <span aria-hidden="true" className="detail-link-arrow">↗</span>
                   </a>
                 ))}
@@ -155,7 +177,7 @@ function DetailSection() {
                 {section.blocks.map((block, bi) => {
                   const isLead = globalBlockIndex === 0 && block.type === 'p'
                   globalBlockIndex++
-                  return renderBlock(block, base, bi, isLead, showImages)
+                  return renderBlock(block, base, bi, isLead)
                 })}
               </section>
             ))}

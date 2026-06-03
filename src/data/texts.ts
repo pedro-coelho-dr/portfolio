@@ -2,14 +2,17 @@ import type { PortfolioItem } from './projects'
 
 export const texts: PortfolioItem[] = [
   {
-    description: 'Philosophical reading of AI through Hannah Arendt — agents, identity, and what remains human.',
-    eyebrow: 'essay',
-    meta: ['AI', 'philosophy', 'agents'],
-    title: 'Notes on AI',
+    avatar: 'img/notes-on-ai/avatar.gif',
+    description: 'Agentes e a condição humana — uma leitura filosófica da IA a partir de Hannah Arendt.',
+    eyebrow: 'ensaio',
+    lang: 'pt-br',
+    meta: ['IA', 'filosofia', 'agentes'],
+    title: 'Notas sobre IA',
     to: '/text/notes-on-ai',
     tone: 'pink',
   },
   {
+    avatar: 'img/juice-shop/avatar.png',
     description: 'Web application pentest report — OWASP Top 10 identification, CWE mapping, CVSS scoring.',
     eyebrow: 'pentest report',
     meta: ['OWASP', 'web security', 'Burp Suite'],
@@ -18,11 +21,30 @@ export const texts: PortfolioItem[] = [
     tone: 'pink',
   },
   {
+    avatar: 'img/insecurebankv2/avatar.png',
     description: 'Android pentest report — OWASP Mobile Top 10, dynamic analysis with Frida and MobSF.',
     eyebrow: 'mobile pentest',
     meta: ['Android', 'MobSF', 'Frida'],
     title: 'InsecureBankv2',
     to: '/text/insecurebankv2',
+    tone: 'pink',
+  },
+  {
+    avatar: 'img/mobsf-report/avatar.png',
+    description: 'MobSF security analysis of vulnerable mobile apps — AndroGoat (Android) and iGoat-Swift (iOS).',
+    eyebrow: 'mobile security',
+    meta: ['MobSF', 'Android', 'iOS'],
+    title: 'MobSF Report',
+    to: '/text/mobsf-report',
+    tone: 'pink',
+  },
+  {
+    avatar: 'img/metasploitable/avatar.png',
+    description: 'Pentest report on Metasploitable 3 — recon, exploitation, and post-exploitation with Metasploit.',
+    eyebrow: 'pentest report',
+    meta: ['Metasploit', 'Nmap', 'Kali'],
+    title: 'Metasploitable',
+    to: '/text/metasploitable',
     tone: 'pink',
   },
 ]

@@ -99,7 +99,7 @@ function Home() {
           <img
             alt="Pedro Coelho logo"
             className="home-hero-logo"
-            src={`${import.meta.env.BASE_URL}logo.png`}
+            src={`${import.meta.env.BASE_URL}img/logo.png`}
           />
           <h1 className="home-hero-title">pedro coelho</h1>
           <p className="home-hero-kicker">offsec · dev · ai</p>
@@ -240,7 +240,7 @@ function Home() {
                             aria-hidden={i !== active}
                             className={`home-feature__frame${i === active ? ' is-active' : ''}`}
                             key={i}
-                            style={{ backgroundImage: `url(${base}glhf/${id}.png)` }}
+                            style={{ backgroundImage: `url(${base}img/glhf/${id}.png)` }}
                           />
                         )
                       })}
