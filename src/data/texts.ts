@@ -3,7 +3,7 @@ import type { PortfolioItem } from './projects'
 export const texts: PortfolioItem[] = [
   {
     avatar: 'img/notes-on-ai/avatar.gif',
-    description: 'Agentes e a condição humana — uma leitura filosófica da IA a partir de Hannah Arendt.',
+    description: 'Uma leitura filosófica da IA a partir de Hannah Arendt.',
     eyebrow: 'ensaio',
     lang: 'pt-br',
     meta: ['IA', 'filosofia', 'agentes'],

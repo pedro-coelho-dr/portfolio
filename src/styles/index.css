@@ -305,6 +305,10 @@
 
   .home-hero-logo {
     width: clamp(3.6rem, 5.5vw, 5rem);
+    /* Square aspect reserves the height before the image loads, so the logo
+       can't shift everything below it (incl. a deep-linked detail's scroll
+       target) when it finally decodes. */
+    aspect-ratio: 1 / 1;
     height: auto;
     margin-bottom: 1.4rem;
     opacity: 0.88;

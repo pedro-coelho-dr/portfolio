@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigationType, useParams } from 'react-router-dom'
 import { detailMap, type Block } from '../data/detail'
 
 type Lightbox = { src: string; alt: string }
@@ -108,8 +108,27 @@ function renderBlock(
  */
 function DetailSection() {
   const { slug } = useParams<{ slug: string }>()
+  const navType = useNavigationType()
   const base = import.meta.env.BASE_URL
   const item = slug ? detailMap[slug] : undefined
+
+  // Own the "scroll to the detail" behaviour, because only this component knows
+  // when the detail is actually mounted and laid out (it's lazy-loaded). PUSH =
+  // opened from the grid → glide down smoothly; POP = deep link / refresh /
+  // back-forward → jump straight to the top of the band. A second pass on the
+  // next frame corrects for any late layout shift (images, fonts) settling in
+  // above the band. Home handles scrolling back up when the detail closes.
+  const bandRef = useRef<HTMLElement>(null)
+  useLayoutEffect(() => {
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    const behavior: ScrollBehavior = reduce || navType === 'POP' ? 'auto' : 'smooth'
+    const toTop = () => bandRef.current?.scrollIntoView({ behavior, block: 'start' })
+    toTop()
+    if (behavior === 'auto') {
+      const raf = requestAnimationFrame(toTop)
+      return () => cancelAnimationFrame(raf)
+    }
+  }, [slug, navType])
 
   // Lightbox for body images — click any image to open a focused overlay.
   const [lightbox, setLightbox] = useState<Lightbox | null>(null)
@@ -139,7 +158,9 @@ function DetailSection() {
   // and keyboard users land on the freshly revealed content.
   const headingRef = useRef<HTMLHeadingElement>(null)
   useEffect(() => {
-    headingRef.current?.focus()
+    // preventScroll: the scroll position is owned by the layout effect above —
+    // focusing must not move the viewport (it used to fight that scroll).
+    headingRef.current?.focus({ preventScroll: true })
   }, [slug])
 
   // Reflect the open entry in the document title + social/meta tags; restore the
@@ -153,12 +174,18 @@ function DetailSection() {
       const title = `${item.title} — Pedro Coelho`
       document.title = title
       const pairs: Array<[string, string]> = [
-        ['meta[name="description"]', item.tagline],
         ['meta[property="og:title"]', title],
-        ['meta[property="og:description"]', item.tagline],
         ['meta[name="twitter:title"]', title],
-        ['meta[name="twitter:description"]', item.tagline],
       ]
+      // Only override the description tags when this entry has a tagline; for
+      // an entry without one (e.g. notes-on-ai), keep the page's default.
+      if (item.tagline) {
+        pairs.push(
+          ['meta[name="description"]', item.tagline],
+          ['meta[property="og:description"]', item.tagline],
+          ['meta[name="twitter:description"]', item.tagline],
+        )
+      }
       for (const [selector, content] of pairs) {
         const el = document.head.querySelector<HTMLMetaElement>(selector)
         if (!el) continue
@@ -178,7 +205,7 @@ function DetailSection() {
 
   if (!item) {
     return (
-      <section className="detail-band" aria-label="Not found">
+      <section className="detail-band" aria-label="Not found" ref={bandRef}>
         <div className="page-shell">
           <div className="detail-article detail-notfound" data-tone="neutral">
             <span className="detail-eyebrow">
@@ -204,7 +231,7 @@ function DetailSection() {
   let globalBlockIndex = 0
 
   return (
-    <section className="detail-band" aria-label={`${item.title} detail`}>
+    <section className="detail-band" aria-label={`${item.title} detail`} ref={bandRef}>
       <div className="page-shell">
         <article
           className="detail-article"
@@ -220,7 +247,9 @@ function DetailSection() {
             <h2 className="detail-title" ref={headingRef} tabIndex={-1}>
               {item.title}
             </h2>
-            <p className="detail-tagline">{item.tagline}</p>
+            {item.tagline ? (
+              <p className="detail-tagline">{item.tagline}</p>
+            ) : null}
 
             {item.links.length > 0 ? (
               <div className="detail-links">

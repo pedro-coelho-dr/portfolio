@@ -14,7 +14,7 @@ export const code: PortfolioItem[] = [
     avatar: 'img/mdout/avatar.png',
     description: 'CLI tool that captures piped command output to Markdown while printing to the terminal.',
     eyebrow: 'cli tool',
-    meta: ['Go', 'CLI', 'Markdown'],
+    meta: ['Go', 'Cobra', 'Markdown'],
     title: 'mdout',
     to: '/code/mdout',
     tone: 'amber',

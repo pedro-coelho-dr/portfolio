@@ -481,7 +481,7 @@ const details: Detail[] = [
       'Pipe any command through mdout — terminal output and a Markdown log file, simultaneously.',
     tone: 'amber',
     meta: [
-      { key: 'stack', value: 'go · yaml' },
+      { key: 'stack', value: 'go · cobra · yaml' },
       { key: 'type', value: 'cli tool' },
       { key: 'license', value: 'gpl-3.0' },
     ],
@@ -515,7 +515,7 @@ const details: Detail[] = [
           {
             type: 'p',
             content:
-              'Preferences stored at ~/.config/mdout.yaml: shell capture method (zsh/bash), default output filename, and syntax highlighting language for code blocks. Install via go install or build from source.',
+              'Built in Go with the Cobra CLI framework. Preferences stored at ~/.config/mdout.yaml: shell capture method (zsh/bash), default output filename, and syntax highlighting language for code blocks. Install via go install or build from source.',
           },
         ],
       },
@@ -630,7 +630,9 @@ const details: Detail[] = [
     category: 'text',
     title: 'Notas sobre IA',
     eyebrow: 'ensaio',
-    tagline: 'Agentes e a condição humana',
+    // No tagline: "Agentes e a condição humana" is the first section's heading
+    // instead (rendered with the pink section-title accent), not a subtitle.
+    tagline: '',
     tone: 'pink',
     lang: 'pt-br',
     meta: [],
@@ -643,6 +645,7 @@ const details: Detail[] = [
     ],
     sections: [
       {
+        title: 'Agentes e a condição humana',
         blocks: [
           {
             type: 'p',

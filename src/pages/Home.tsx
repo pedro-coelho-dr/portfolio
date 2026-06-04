@@ -43,9 +43,12 @@ function Home() {
       : tabFromHash(location.hash)
 
   function selectTab(next: Tab) {
-    if (next === tab) return
     // Switching tabs always returns to the grid (closes any open detail).
-    navigate({ pathname: '/', hash: `#${next}` })
+    if (next !== tab) navigate({ pathname: '/', hash: `#${next}` })
+    // Bring the works section into view — clicking a tab from the hero (or with
+    // a detail open) should land on the grid, not leave you scrolled elsewhere.
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    sectionRef.current?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' })
   }
 
   // Roving-focus keyboard support for the tablist (ARIA tabs pattern): arrow
@@ -65,7 +68,6 @@ function Home() {
   }
 
   const sectionRef = useRef<HTMLElement>(null)
-  const detailRef = useRef<HTMLDivElement>(null)
   const worksRef = useRef<HTMLDivElement>(null)
 
   // Reveal-once on scroll via IntersectionObserver — cross-browser and never
@@ -105,17 +107,16 @@ function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Smooth-scroll to the detail when it opens (or switches), and back to the
-  // works grid when it closes — the page feels like one continuous surface.
-  const prevSlug = useRef<string | undefined>(undefined)
+  // DetailSection scrolls to itself when a detail opens or is deep-linked (it
+  // alone knows when its lazy content is mounted). Home only needs to glide
+  // back up to the works grid when a detail closes — the page stays one
+  // continuous surface. prevSlug starts at the current slug so a deep-linked
+  // load doesn't count as a "close".
+  const prevSlug = useRef<string | undefined>(activeSlug)
   useEffect(() => {
-    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-    const behavior: ScrollBehavior = reduce ? 'auto' : 'smooth'
-    if (activeSlug && activeSlug !== prevSlug.current) {
-      const el = detailRef.current
-      if (el) setTimeout(() => el.scrollIntoView({ behavior, block: 'start' }), 60)
-    } else if (!activeSlug && prevSlug.current) {
-      sectionRef.current?.scrollIntoView({ behavior, block: 'start' })
+    if (!activeSlug && prevSlug.current) {
+      const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+      sectionRef.current?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' })
     }
     prevSlug.current = activeSlug
   }, [activeSlug])
@@ -370,7 +371,7 @@ function Home() {
         </div>
       </section>
 
-      <div ref={detailRef}>
+      <div>
         <Suspense fallback={null}>
           <Outlet />
         </Suspense>
