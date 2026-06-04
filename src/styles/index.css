@@ -44,6 +44,38 @@
        that gains or loses a vertical scrollbar shifts every centered element
        left/right by ~8px (half the scrollbar width). */
     scrollbar-gutter: stable;
+    /* Standard scrollbar styling (Firefox, Chromium 121+): a soft cream thumb
+       on a near-invisible track. WebKit pseudo-elements below refine it for
+       Chrome/Safari. (OS overlay bars on macOS/mobile ignore both.) */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(236, 230, 216, 0.28) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: rgba(236, 230, 216, 0.22);
+    border-radius: 999px;
+    /* Transparent border carves padding inside the track so the thumb reads as
+       a slim pill rather than filling the full 10px channel. */
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    transition: background-color 200ms ease;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(236, 230, 216, 0.5);
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: transparent;
   }
 
   body {

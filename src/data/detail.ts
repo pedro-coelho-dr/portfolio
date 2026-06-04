@@ -525,7 +525,7 @@ const details: Detail[] = [
   {
     slug: 'cve-etl-project',
     category: 'code',
-    title: 'CVE ETL Project',
+    title: 'CVE-ETL',
     eyebrow: 'data engineering',
     tagline:
       'An ETL pipeline and dimensional data warehouse for CVE vulnerability data — from raw records to Metabase dashboards.',
