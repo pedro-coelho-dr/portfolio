@@ -55,7 +55,7 @@ function HeroWeb() {
       canvas!.style.height = `${height}px`
       ctx!.setTransform(dpr, 0, 0, dpr, 0, 0)
 
-      const count = Math.min(92, Math.max(28, Math.round((width * height) / 13000)))
+      const count = Math.min(110, Math.max(34, Math.round((width * height) / 11000)))
       nodes = Array.from({ length: count }, () => {
         const [r, g, b] = PALETTE[(Math.random() * PALETTE.length) | 0]
         return {

@@ -159,8 +159,23 @@
   }
 
   .home-hero-logo {
-    animation: fade-up 0.55s ease both;
-    animation-delay: 0ms;
+    /* Entrance fade-up, then a slow continuous spin once it settles. The spin
+       is delayed past the fade-up so the two transforms don't fight. */
+    animation:
+      fade-up 0.55s ease both,
+      logo-spin 36s linear 0.55s infinite;
+  }
+
+  /* Explicit 0→360 on the independent `rotate` property: angle interpolation
+     (a to-only `transform: rotate(360deg)` resolves to the identity matrix and
+     never moves), and `rotate` can't collide with fade-up's `transform`. */
+  @keyframes logo-spin {
+    from {
+      rotate: 0deg;
+    }
+    to {
+      rotate: 360deg;
+    }
   }
 
   .home-hero-title {
@@ -1008,9 +1023,12 @@
       transform: none;
     }
 
-    /* Cascade cards within a grid as they enter. */
-    .card-grid > .reveal:nth-child(2) { transition-delay: 80ms; }
-    .card-grid > .reveal:nth-child(3) { transition-delay: 160ms; }
+    /* Cascade cards within a grid as they enter. Keyed to column position
+       (3-up on desktop) so each row restarts the left→right sweep and the
+       stagger stays short (max 160ms) for grids of any length — the Code/Text
+       tabs run 4–5 cards, which would otherwise trail off with a long delay. */
+    .card-grid > .reveal:nth-child(3n + 2) { transition-delay: 80ms; }
+    .card-grid > .reveal:nth-child(3n + 3) { transition-delay: 160ms; }
   }
 
   .tab-panel__grid-spacer {
@@ -1082,14 +1100,29 @@
     box-shadow: 0 0 12px var(--active-accent);
   }
 
+  /* Unified neutral placeholder shown when a card has no avatar (and behind the
+     destaque stage when its screenshots are missing). A faint cream sun-ray
+     motif over the ambient dotted grid — tone-agnostic, on-brand with the
+     rotating sun logo. Any real avatar/screenshot sits on top and hides it. */
+  .specimen-card-image,
+  .home-feature__stage {
+    background-color: var(--color-elevated);
+    background-image:
+      radial-gradient(ellipse at 50% 42%, rgba(236, 230, 216, 0.06) 0%, transparent 60%),
+      repeating-conic-gradient(
+        from -18deg at 50% 112%,
+        rgba(236, 230, 216, 0.038) 0deg 8deg,
+        rgba(236, 230, 216, 0.018) 8deg 16deg,
+        transparent 16deg 24deg
+      ),
+      linear-gradient(rgba(236, 230, 216, 0.012) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(236, 230, 216, 0.01) 1px, transparent 1px);
+    background-size: auto, auto, 20px 20px, 20px 20px;
+  }
+
   .specimen-card-image {
     position: relative;
     border-bottom: 1px solid rgba(236, 230, 216, 0.06);
-    background:
-      linear-gradient(rgba(236, 230, 216, 0.012) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(236, 230, 216, 0.01) 1px, transparent 1px),
-      var(--color-elevated);
-    background-size: 20px 20px, 20px 20px, auto;
   }
 
   /* Padding spacer for the 4:3 ratio — same iOS Safari aspect-ratio caveat as
@@ -1107,6 +1140,22 @@
     height: 100%;
     object-fit: cover;
     display: block;
+    /* Fade up from the unified placeholder once the avatar decodes, instead of
+       popping in. VisualCard flips data-loaded on load (and on mount for
+       already-cached images). */
+    opacity: 0;
+    transition: opacity 600ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .specimen-card-image img[data-loaded] {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .specimen-card-image img {
+      opacity: 1;
+      transition: none;
+    }
   }
 
   .specimen-card-image::after {
@@ -1120,30 +1169,6 @@
 
   .specimen-card--link:hover .specimen-card-image::after {
     opacity: 0.65;
-  }
-
-  .specimen-card-image[data-tone="amber"] {
-    background:
-      radial-gradient(ellipse at 35% 45%, rgba(245, 213, 71, 0.13) 0%, transparent 60%),
-      repeating-conic-gradient(
-        from -18deg at 50% 110%,
-        rgba(245, 213, 71, 0.055) 0deg 8deg,
-        rgba(228, 180, 50, 0.03) 8deg 16deg,
-        transparent 16deg 24deg
-      ),
-      #0d0b09;
-  }
-
-  .specimen-card-image[data-tone="red"] {
-    background:
-      radial-gradient(ellipse at 35% 45%, rgba(229, 72, 77, 0.15) 0%, transparent 60%),
-      repeating-conic-gradient(
-        from -18deg at 50% 110%,
-        rgba(229, 72, 77, 0.065) 0deg 8deg,
-        rgba(200, 60, 65, 0.035) 8deg 16deg,
-        transparent 16deg 24deg
-      ),
-      #0d0b09;
   }
 
   .specimen-card-info {
@@ -1383,12 +1408,44 @@
   /* ── Footer ──────────────────────────────────────────────────── */
 
   .footer-contact {
+    position: relative;
     margin-top: auto;
     border-top: 1px solid rgba(236, 230, 216, 0.06);
     background: rgba(8, 8, 7, 0.5);
+    /* Room for the interactive constellation behind the contact content. */
+    min-height: clamp(12rem, 18vh, 16rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* Grayscale interactive web — sits behind the footer content and fades out
+     through the centre so the contact links/text stay legible over it. */
+  .footer-web {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    -webkit-mask-image: radial-gradient(
+      130% 155% at 50% 50%,
+      rgba(0, 0, 0, 0.5) 0%,
+      rgba(0, 0, 0, 0.72) 42%,
+      #000 100%
+    );
+    mask-image: radial-gradient(
+      130% 155% at 50% 50%,
+      rgba(0, 0, 0, 0.5) 0%,
+      rgba(0, 0, 0, 0.72) 42%,
+      #000 100%
+    );
   }
 
   .footer-contact-inner {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1572,7 +1629,8 @@
 
   .home-feature__stage {
     position: relative;
-    background: var(--color-elevated);
+    /* background (the unified placeholder) is set in the shared rule above so a
+       missing screenshot reveals it instead of a flat block. */
     overflow: hidden;
   }
 
@@ -1611,7 +1669,10 @@
   .home-feature__frame {
     position: absolute;
     inset: 0;
-    background-color: var(--color-elevated);
+    /* Transparent fallback (not a solid fill) so a missing screenshot reveals
+       the stage placeholder behind it. The crossfade holds the outgoing frame
+       opaque until the incoming one is fully in, so no placeholder bleed. */
+    background-color: transparent;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;

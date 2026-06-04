@@ -1,9 +1,11 @@
 import { CONTACT_EMAIL, CONTACT_PHONE, CONTACT_WHATSAPP } from '../data/contact'
+import FooterWeb from './FooterWeb'
 
 function Footer() {
   const base = import.meta.env.BASE_URL
   return (
     <footer className="footer-contact">
+      <FooterWeb />
       <div className="page-shell footer-contact-inner">
         <nav aria-label="Contact links" className="footer-links">
           <a

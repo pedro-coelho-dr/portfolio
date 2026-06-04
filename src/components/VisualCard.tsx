@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 type VisualCardProps = {
@@ -16,6 +17,7 @@ function VisualCard({ activeSlug, avatar, description, eyebrow, lang, meta, titl
   const target = to ?? '/project/glhf'
   const isActive = Boolean(activeSlug) && target.endsWith(`/${activeSlug}`)
   const avatarSrc = avatar ? `${import.meta.env.BASE_URL}${avatar}` : undefined
+  const [loaded, setLoaded] = useState(false)
 
   return (
     <Link
@@ -25,7 +27,16 @@ function VisualCard({ activeSlug, avatar, description, eyebrow, lang, meta, titl
       to={target}
     >
       <div aria-hidden="true" className="specimen-card-image" data-tone={tone ?? 'neutral'}>
-        {avatarSrc ? <img alt="" loading="lazy" src={avatarSrc} /> : null}
+        {avatarSrc ? (
+          <img
+            alt=""
+            data-loaded={loaded ? '' : undefined}
+            loading="lazy"
+            onLoad={() => setLoaded(true)}
+            ref={(el) => { if (el?.complete) setLoaded(true) }}
+            src={avatarSrc}
+          />
+        ) : null}
       </div>
       <div className="specimen-card-info">
         {eyebrow ? (
