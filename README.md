@@ -1,5 +1,5 @@
 # Pedro Coelho — Portfolio
-
+.
 Personal portfolio of Pedro Coelho (offensive security · dev · applied AI). A
 single-page React app with an editorial, dark aesthetic, deployed to GitHub
 Pages under the `/portfolio/` base path.
